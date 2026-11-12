@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="400" height="400" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background shapes -->
+  <rect width="400" height="400" fill="#1A0733" />
+  
+  <!-- Memphis-style decorative elements -->
+  <polygon points="80,150 110,170 80,190" fill="#00FFFF" />
+  <polygon points="320,150 350,170 320,190" fill="#FF00FF" />
+  <polygon points="200,320 230,350 170,350" fill="#FFFF00" />
+  
+  <!-- Yellow dots -->
+  <circle cx="120" cy="240" r="5" fill="#FFFF00" />
+  <circle cx="140" cy="240" r="5" fill="#FFFF00" />
+  <circle cx="160" cy="240" r="5" fill="#FFFF00" />
+  <circle cx="180" cy="240" r="5" fill="#FFFF00" />
+  <circle cx="120" cy="260" r="5" fill="#FFFF00" />
+  <circle cx="140" cy="260" r="5" fill="#FFFF00" />
+  <circle cx="160" cy="260" r="5" fill="#FFFF00" />
+  <circle cx="180" cy="260" r="5" fill="#FFFF00" />
+  <circle cx="120" cy="280" r="5" fill="#FFFF00" />
+  <circle cx="140" cy="280" r="5" fill="#FFFF00" />
+  <circle cx="160" cy="280" r="5" fill="#FFFF00" />
+  <circle cx="180" cy="280" r="5" fill="#FFFF00" />
+  
+  <!-- Dog -->
+  <g transform="translate(130, 100) scale(0.8)">
+    <!-- Dog body -->
+    <path d="M120,50 C180,30 200,100 180,150 C160,200 100,200 80,150 C60,100 80,30 120,50" fill="#D2691E" />
+    
+    <!-- Dog face -->
+    <path d="M120,50 C140,40 160,60 160,90 C160,120 140,140 120,140 C100,140 80,120 80,90 C80,60 100,40 120,50" fill="#D2691E" />
+    
+    <!-- Dog ears -->
+    <path d="M80,90 C60,70 50,100 60,120 C70,140 90,130 90,110 Z" fill="#D2691E" />
+    <path d="M160,90 C180,70 190,100 180,120 C170,140 150,130 150,110 Z" fill="#D2691E" />
+    
+    <!-- Dog face markings -->
+    <path d="M120,50 C130,45 140,50 140,90 C140,130 130,135 120,135 C110,135 100,130 100,90 C100,50 110,45 120,50" fill="#FFF5E1" />
+    
+    <!-- Dog eyes -->
+    <circle cx="105" cy="95" r="8" fill="#1A0733" />
+    <circle cx="135" cy="95" r="8" fill="#1A0733" />
+    <circle cx="103" cy="93" r="2" fill="white" />
+    <circle cx="133" cy="93" r="2" fill="white" />
+    
+    <!-- Dog nose -->
+    <ellipse cx="120" cy="115" rx="10" ry="7" fill="#1A0733" />
+    
+    <!-- Dog tongue -->
+    <path d="M120,125 C125,130 130,135 125,145 C120,150 115,145 110,145 C105,135 110,130 115,125 Z" fill="#FF6347" />
+    
+    <!-- Dog collar -->
+    <path d="M90,140 C100,150 140,150 150,140 C150,145 140,155 120,155 C100,155 90,145 90,140 Z" fill="#800080" />
+    
+    <!-- RP Badge -->
+    <circle cx="120" cy="150" r="15" fill="#FFFF00" />
+    <text x="120" y="155" font-family="Arial" font-size="14" font-weight="bold" text-anchor="middle" fill="#1A0733">RP</text>
+  </g>
+  
+  <!-- Magnifying glass -->
+  <g transform="translate(220, 150) rotate(15)">
+    <circle cx="0" cy="0" r="30" stroke="#00FFFF" stroke-width="8" fill="none" />
+    <rect x="-5" y="25" width="10" height="40" fill="#00FFFF" transform="rotate(45)" />
+  </g>
+</svg>
