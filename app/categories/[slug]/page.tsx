@@ -60,7 +60,7 @@ export default function CategoryPage({ params }: { params: Promise<{ slug: strin
             </div>
             <Image
               src="/images/scout-full.webp"
-              alt={`Scout — ${meta.label}`}
+              alt={`Scout, ${meta.label}`}
               width={150} height={150}
               className="flex-shrink-0 rounded-2xl rotate-2 shadow-2xl"
               style={{ width: 'min(132px, 27vw)', height: 'auto' }}
@@ -88,7 +88,7 @@ export default function CategoryPage({ params }: { params: Promise<{ slug: strin
           {!loading && recalls.length === 0 && (
             <div className="text-center py-12 text-white/60">
               <div className="text-4xl mb-3">🐾</div>
-              <p>No recent recalls in this category — Scout is keeping watch!</p>
+              <p>No recent recalls in this category. Scout is keeping watch.</p>
             </div>
           )}
 

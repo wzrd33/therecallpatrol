@@ -6,6 +6,12 @@ import Link from 'next/link';
 import type { Recall } from '@/types/recalls';
 import { useLists } from '@/lib/lists';
 import { RecallSheet, recallEmoji } from '@/components/recall-sheet';
+import { PatrolReport } from '@/components/patrol-report';
+import { MyHome } from '@/components/my-home';
+import { RecallOfDay, pickRecallOfDay } from '@/components/recall-of-day';
+import { usePatrol } from '@/hooks/use-patrol';
+import { useHomeItems } from '@/hooks/use-home-items';
+import { findOwnedMatches } from '@/utils/recall-match';
 
 const CATEGORIES = [
   { slug: 'kids',         label: 'Kids',      emoji: '🧸', color: '#B026FF' },
@@ -38,6 +44,16 @@ export default function HomePage() {
     () => [...recalls].sort((a, b) => b.date.localeCompare(a.date)).slice(0, CAROUSEL_LIMIT),
     [recalls],
   );
+
+  const patrol = usePatrol(recalls);
+  const { items: homeItems, addItem, removeItem } = useHomeItems();
+  const homeMatches = useMemo(() => {
+    const out: Record<string, Recall[]> = {};
+    homeItems.forEach(i => { out[i.id] = findOwnedMatches(recalls, i.name); });
+    return out;
+  }, [homeItems, recalls]);
+  const homeAlerts = homeItems.filter(i => homeMatches[i.id]?.length > 0).length;
+  const recallOfDay = useMemo(() => pickRecallOfDay(recalls), [recalls]);
 
   const scroll = (dir: number) => {
     trackRef.current?.scrollBy({ left: dir * 340, behavior: 'smooth' });
@@ -76,7 +92,7 @@ export default function HomePage() {
             <span className="text-magenta">Guard Your Home.</span>
           </h1>
           <p className="text-white/70 mb-6 text-base max-w-md mx-auto">
-            Real-time alerts on recalled products — food, toys, appliances, and more.
+            Real-time alerts on recalled products: food, toys, appliances, and more.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center max-w-xs sm:max-w-none mx-auto">
             <Link href="/signup" className="btn-primary">Start Patrolling Free <span aria-hidden="true">→</span></Link>
@@ -85,13 +101,34 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Patrol report: streak, what's new, My Home status */}
+      {!error && (
+        <section className="bg-navy px-4 pb-6">
+          <div className="max-w-6xl mx-auto">
+            <PatrolReport
+              ready={patrol.ready}
+              firstVisit={patrol.firstVisit}
+              newCount={patrol.newIds.size}
+              lastVisit={patrol.lastVisit}
+              streak={patrol.streak}
+              nickname={patrol.nickname}
+              homeCount={homeItems.length}
+              homeAlerts={homeAlerts}
+            />
+          </div>
+        </section>
+      )}
+
       {/* Blockbuster Carousel */}
-      <section className="bg-navy pt-2 pb-8">
+      <section id="now-recalled" className="bg-navy pt-2 pb-8 scroll-mt-16">
         <div className="max-w-6xl mx-auto">
           <div className="flex items-center justify-between px-4 mb-2">
             <div className="flex items-center gap-2">
               <h2 className="text-white font-bold text-lg" style={{ fontFamily: "'Space Grotesk',sans-serif" }}>📼 Now Recalled</h2>
               <span className="px-2 py-0.5 bg-magenta text-white text-xs font-bold rounded uppercase tracking-wide animate-pulse">Live</span>
+              {patrol.newIds.size > 0 && (
+                <span className="px-2 py-0.5 bg-yellow text-navy text-xs font-bold rounded uppercase tracking-wide">{patrol.newIds.size} new</span>
+              )}
             </div>
             <div className="flex gap-2">
               <button type="button" aria-label="Scroll recalls left" onClick={() => scroll(-1)} className="tap w-11 h-11 rounded-full border border-white/20 bg-white/5 text-white text-xl hover:bg-magenta hover:border-magenta">‹</button>
@@ -131,6 +168,7 @@ export default function HomePage() {
                   >
                     <span className="h-20 w-full flex items-center justify-center text-4xl relative flex-shrink-0">
                       {recallEmoji(r)}
+                      {patrol.newIds.has(r.id) && <span className="new-flag absolute top-3 left-2">New</span>}
                       <span className="sev-badge absolute top-3 right-2" data-sev={r.severity}>
                         {sevLabel[r.severity]}
                       </span>
@@ -170,10 +208,20 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Recall of the day + My Home */}
+      {!error && (
+        <section className="bg-navy border-t border-white/10 px-4 py-8">
+          <div className="max-w-6xl mx-auto grid gap-4 lg:grid-cols-2 items-start">
+            <RecallOfDay recall={recallOfDay} onOpen={setSelected} />
+            <MyHome items={homeItems} matches={homeMatches} loading={loading} onAdd={addItem} onRemove={removeItem} onOpen={setSelected} />
+          </div>
+        </section>
+      )}
+
       {/* Category grid */}
       <section className="bg-navy border-t border-white/10">
       <div className="max-w-6xl mx-auto px-4 pt-8 pb-12">
-        <p className="text-xs font-bold uppercase tracking-widest text-cyan mb-1">Your Lists</p>
+        <p className="text-xs font-bold uppercase tracking-widest text-cyan mb-1">Browse</p>
         <h2 className="text-white text-2xl font-extrabold mb-5" style={{ fontFamily: "'Space Grotesk',sans-serif" }}>
           Scout's <span className="text-magenta">On Watch</span>
         </h2>

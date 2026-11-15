@@ -6,10 +6,10 @@ import './globals.css';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://therecallpatrol.com'),
-  title: 'Recall Patrol — Guard Your Home',
-  description: 'Real-time alerts on recalled products — food, toys, appliances, and more. Free household safety tracking.',
+  title: 'Recall Patrol | Guard Your Home',
+  description: 'Real-time alerts on recalled products: food, toys, appliances, and more. Free household safety tracking.',
   openGraph: {
-    title: 'Recall Patrol — Guard Your Home',
+    title: 'Recall Patrol | Guard Your Home',
     description: 'Real-time alerts on recalled products for your household.',
     url: 'https://therecallpatrol.com',
     siteName: 'Recall Patrol',
@@ -58,7 +58,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <div className="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4 text-white/50 text-sm">
             <div className="flex items-center gap-2">
               <Image src="/images/scout-logo.webp" alt="Scout" width={28} height={28} className="rounded-md opacity-70" />
-              <span>Recall Patrol — keeping households safe</span>
+              <span>Recall Patrol. Keeping households safe.</span>
             </div>
             <span>© {new Date().getFullYear()} therecallpatrol.com</span>
           </div>

@@ -3,17 +3,22 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { saveProfile } from '@/hooks/use-patrol';
 
 export default function SignupPage() {
+  const [nickname, setNickname] = useState('');
+  const [email, setEmail] = useState('');
+  const [zip, setZip] = useState('');
   const [submitted, setSubmitted] = useState(false);
 
   if (submitted) {
     return (
       <div className="bg-navy text-white flex-1 flex flex-col items-center justify-center px-4 py-16 text-center">
-        <div className="text-6xl mb-4">🎉</div>
-        <h1 className="text-2xl font-extrabold mb-2" style={{ fontFamily: "'Space Grotesk',sans-serif" }}>Welcome to the Patrol!</h1>
-        <p className="text-white/70 mb-6 max-w-sm">Scout is on the job. We'll alert you the moment a recalled product matches your lists.</p>
-        <Link href="/" className="btn-primary">Go to Feed</Link>
+        <div className="text-6xl mb-4" aria-hidden="true">🐾</div>
+        <h1 className="text-2xl font-extrabold mb-2" style={{ fontFamily: "'Space Grotesk',sans-serif" }}>You're on patrol, {nickname.trim()}!</h1>
+        <p className="text-white/70 mb-2 max-w-sm">Your details are saved on this device. Next, tell Scout what's in your house so it can check it every time you visit.</p>
+        <p className="text-white/50 text-sm mb-6 max-w-sm">Daily email alerts aren't switched on yet. You'll be able to turn them on here when they are.</p>
+        <Link href="/#my-home" className="btn-primary">Set up My Home</Link>
       </div>
     );
   }
@@ -26,64 +31,40 @@ export default function SignupPage() {
         <h1 className="text-3xl font-extrabold tracking-tight" style={{ fontFamily: "'Space Grotesk',sans-serif" }}>
           Join the <span className="text-magenta">Patrol</span>
         </h1>
-        <p className="text-white/70 text-sm mt-1">Scout watches recalled products for your household — free forever.</p>
+        <p className="text-white/70 text-sm mt-1">Scout watches recalled products for your household. Free, and no password to remember.</p>
       </div>
 
       <form
-        onSubmit={e => { e.preventDefault(); setSubmitted(true); }}
+        onSubmit={e => {
+          e.preventDefault();
+          saveProfile({ nickname: nickname.trim(), email: email.trim(), zip: zip.trim() });
+          setSubmitted(true);
+        }}
         className="signup-card space-y-4"
       >
         <div>
           <label className="field-label" htmlFor="nick">Nickname</label>
-          <input id="nick" type="text" required placeholder="What should Scout call you?" autoComplete="nickname"
-            className="field w-full" />
+          <input id="nick" type="text" required maxLength={30} value={nickname} onChange={e => setNickname(e.target.value)}
+            placeholder="What should Scout call you?" autoComplete="nickname" className="field w-full" />
         </div>
 
         <div>
           <label className="field-label" htmlFor="email">Email</label>
-          <input id="email" type="email" required placeholder="you@email.com" autoComplete="email"
-            className="field w-full" />
+          <input id="email" type="email" required value={email} onChange={e => setEmail(e.target.value)}
+            placeholder="you@email.com" autoComplete="email" className="field w-full" />
+          <p className="text-xs text-white/55 mt-1">For daily alerts once they launch. Kept on this device until then.</p>
         </div>
 
         <div>
-          <label className="field-label">Date of Birth</label>
-          <div className="flex gap-2">
-            <select required autoComplete="bday-month"
-              className="field flex-1 min-w-0">
-              <option value="">Month</option>
-              {['January','February','March','April','May','June','July','August','September','October','November','December'].map(m => (
-                <option key={m}>{m}</option>
-              ))}
-            </select>
-            <input type="number" required placeholder="Day" min={1} max={31} autoComplete="bday-day"
-              className="field w-20" />
-            <input type="number" required placeholder="Year" min={1920} max={2010} autoComplete="bday-year"
-              className="field w-24" />
-          </div>
-        </div>
-
-        <div>
-          <label className="field-label" htmlFor="zip">Zip Code</label>
-          <input id="zip" type="text" required inputMode="numeric" pattern="[0-9]{5}" maxLength={5} placeholder="12345" autoComplete="postal-code"
-            className="field w-full" />
-          <p className="text-xs text-white/55 mt-1">Used to show recalls near you</p>
-        </div>
-
-        <div>
-          <label className="field-label" htmlFor="pass">Password</label>
-          <input id="pass" type="password" required placeholder="Create a password" autoComplete="new-password"
-            className="field w-full" />
+          <label className="field-label" htmlFor="zip">Zip Code <span className="normal-case tracking-normal font-normal text-white/50">(optional)</span></label>
+          <input id="zip" type="text" inputMode="numeric" pattern="[0-9]{5}" maxLength={5} value={zip} onChange={e => setZip(e.target.value)}
+            placeholder="12345" autoComplete="postal-code" className="field w-full" />
         </div>
 
         <button type="submit" className="btn-primary w-full !mt-6" style={{ minHeight: 56 }}>
-          🐾 Start Patrolling
+          Start Patrolling
         </button>
       </form>
-
-      <p className="text-center text-sm text-white/60 mt-3">
-        Already have an account?{' '}
-        <button type="button" className="tap px-2 text-yellow hover:underline" onClick={() => alert('Sign-in coming soon!')}>Sign in</button>
-      </p>
     </div>
     </div>
   );
