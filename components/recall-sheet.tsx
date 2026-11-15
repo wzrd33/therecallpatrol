@@ -1,0 +1,111 @@
+'use client';
+
+import { useEffect, useRef } from 'react';
+import type { Recall } from '@/types/recalls';
+
+const sevRisk = { high: 'High risk', medium: 'Medium risk', low: 'Low risk' };
+
+export function recallEmoji(r: Recall): string {
+  const t = r.title.toLowerCase();
+  if (r.category === 'kids') {
+    if (t.includes('stroller') || t.includes('car seat')) return '🚗';
+    if (t.includes('toy') || t.includes('game')) return '🧸';
+    return '🍼';
+  }
+  if (r.category === 'pantry') {
+    if (t.includes('peanut')) return '🥜';
+    if (t.includes('chicken') || t.includes('meat')) return '🍗';
+    return '🥫';
+  }
+  if (r.category === 'refrigerator') return t.includes('refrigerat') ? '❄️' : '🧊';
+  if (r.category === 'household') {
+    if (t.includes('cable') || t.includes('charger')) return '🔌';
+    if (t.includes('fan') || t.includes('heater')) return '🌡️';
+    return '🏠';
+  }
+  if (r.category === 'pets') return '🐾';
+  if (t.includes('fire') || t.includes('burn')) return '🔥';
+  if (t.includes('food')) return '🍽️';
+  return '⚠️';
+}
+
+export function RecallSheet({ recall, isAdded, onToggle, onClose }: {
+  recall: Recall;
+  isAdded: boolean;
+  onToggle: () => void;
+  onClose: () => void;
+}) {
+  const closeRef = useRef<HTMLButtonElement>(null);
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
+
+  // Lock page scroll, close on Escape, move focus into the sheet
+  useEffect(() => {
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onCloseRef.current(); };
+    window.addEventListener('keydown', onKey);
+    closeRef.current?.focus();
+    return () => { document.body.style.overflow = prev; window.removeEventListener('keydown', onKey); };
+  }, []);
+
+  return (
+    <div className="sheet-backdrop" onClick={() => onClose()}>
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="recall-sheet-title"
+        data-sev={recall.severity}
+        className="sheet"
+        onClick={e => e.stopPropagation()}
+      >
+        <div className="sheet-head">
+          <span className="text-5xl" aria-hidden="true">{recallEmoji(recall)}</span>
+          <button ref={closeRef} type="button" aria-label="Close" onClick={() => onClose()} className="tap w-11 h-11 rounded-full bg-white/10 text-white text-2xl hover:bg-white/20">×</button>
+        </div>
+        <div className="sheet-body">
+          <div className="flex items-center gap-2 flex-wrap mb-3">
+            <span className="sev-pill" data-sev={recall.severity} data-on-dark="">{sevRisk[recall.severity]}</span>
+            <span className="text-cyan-light text-xs font-bold uppercase tracking-wider">{recall.category}</span>
+            <span className="text-white/60 text-xs">· {recall.dateFormatted}</span>
+          </div>
+          <h3 id="recall-sheet-title" className="text-white text-xl font-extrabold leading-snug tracking-tight mb-4" style={{ fontFamily: "'Space Grotesk',sans-serif" }}>
+            {recall.title}
+          </h3>
+          {recall.hazard && (
+            <div className="sheet-hazard mb-4">
+              <p className="sheet-label">⚠ The hazard</p>
+              <p className="text-white text-sm leading-relaxed">{recall.hazard}</p>
+            </div>
+          )}
+          {recall.products && (
+            <div className="mb-4">
+              <p className="sheet-label">Products affected</p>
+              <p className="text-white/90 text-sm leading-relaxed">{recall.products}</p>
+            </div>
+          )}
+          {recall.description && (
+            <div className="mb-2">
+              <p className="sheet-label">How to identify it</p>
+              <p className="text-white/80 text-sm leading-relaxed whitespace-pre-line">{recall.description}</p>
+            </div>
+          )}
+        </div>
+        <div className="sheet-foot">
+          <button
+            type="button"
+            aria-pressed={isAdded}
+            onClick={onToggle}
+            className="tap flex-1 rounded-full text-sm text-white px-4"
+            style={{ background: isAdded ? '#259A36' : '#FF2B85' }}
+          >
+            {isAdded ? '✓ On my watchlist' : '+ Add to watchlist'}
+          </button>
+          <a href={recall.url} target="_blank" rel="noopener noreferrer" className="tap flex-1 rounded-full text-sm px-4 border border-white/30 text-white hover:bg-white/10">
+            Official notice ↗
+          </a>
+        </div>
+      </div>
+    </div>
+  );
+}

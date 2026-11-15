@@ -5,16 +5,17 @@ import Image from 'next/image';
 import Link from 'next/link';
 import type { Recall, Category } from '@/types/recalls';
 import { useLists } from '@/lib/lists';
+import { RecallSheet } from '@/components/recall-sheet';
 
-const META: Record<string, { label: string; desc: string; bg: string; accentColor: string; emoji: string }> = {
-  kids:         { label: 'Kids & Baby',   desc: 'Toys, clothing, car seats, cribs, strollers, and more.',   bg: 'linear-gradient(135deg,#4A1A8B,#7B10CC)', accentColor: '#FFDC28', emoji: '🧸' },
-  pantry:       { label: 'Pantry',        desc: 'Canned goods, dry foods, snacks, condiments, and more.',   bg: 'linear-gradient(135deg,#1A5A30,#1E9A50)', accentColor: '#FFDC28', emoji: '🥫' },
-  refrigerator: { label: 'Refrigerator',  desc: 'Meats, dairy, produce, and refrigerator appliances.',      bg: 'linear-gradient(135deg,#0A3A8A,#1060C0)', accentColor: '#00C9D7', emoji: '🧊' },
-  household:    { label: 'Household',     desc: 'Furniture, appliances, electronics, tools, and more.',     bg: 'linear-gradient(135deg,#6B3A00,#B06010)', accentColor: '#FFDC28', emoji: '🏠' },
-  pets:         { label: 'Pets',          desc: 'Pet food, toys, accessories, and veterinary products.',    bg: 'linear-gradient(135deg,#7A0A0A,#C03030)', accentColor: '#FF2B85', emoji: '🐾' },
+const META: Record<string, { label: string; desc: string; color: string; emoji: string }> = {
+  kids:         { label: 'Kids & Baby',   desc: 'Toys, clothing, car seats, cribs, strollers, and more.',   color: '#B026FF', emoji: '🧸' },
+  pantry:       { label: 'Pantry',        desc: 'Canned goods, dry foods, snacks, condiments, and more.',   color: '#19E57A', emoji: '🥫' },
+  refrigerator: { label: 'Refrigerator',  desc: 'Meats, dairy, produce, and refrigerator appliances.',      color: '#00C9D7', emoji: '🧊' },
+  household:    { label: 'Household',     desc: 'Furniture, appliances, electronics, tools, and more.',     color: '#FF9A1A', emoji: '🏠' },
+  pets:         { label: 'Pets',          desc: 'Pet food, toys, accessories, and veterinary products.',    color: '#FF2B85', emoji: '🐾' },
 };
 
-const sevColor = { high: '#FF2B85', medium: '#FFDC28', low: '#00C9D7' };
+const sevLabel: Record<string, string> = { high: 'High risk', medium: 'Medium risk', low: 'Low risk' };
 
 export default function CategoryPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = React.use(params);
@@ -23,6 +24,7 @@ export default function CategoryPage({ params }: { params: Promise<{ slug: strin
   const [recalls, setRecalls] = useState<Recall[]>([]);
   const [loading, setLoading] = useState(true);
   const { added, toggle, getByCategory } = useLists();
+  const [selected, setSelected] = useState<Recall | null>(null);
   const [listItems, setListItems] = useState<ReturnType<typeof getByCategory>>([]);
 
   useEffect(() => {
@@ -41,28 +43,30 @@ export default function CategoryPage({ params }: { params: Promise<{ slug: strin
   }, [added, slug, getByCategory]);
 
   return (
-    <>
-      {/* Back */}
-      <Link href="/" className="inline-flex items-center gap-1 m-4 px-4 py-1.5 rounded-full border border-white/20 bg-white/5 text-white text-sm font-medium hover:bg-white/10 transition-colors" style={{ background: 'rgba(26,0,45,0.8)' }}>
-        ← Back to Feed
-      </Link>
-
+    <div className="bg-navy text-white flex-1" style={{ '--cat': meta.color } as React.CSSProperties}>
       {/* Category hero */}
-      <section className="px-4 pb-10 pt-2 flex items-center gap-6 flex-wrap" style={{ background: meta.bg }}>
-        <div className="flex-1 min-w-48">
-          <p className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: meta.accentColor }}>{meta.emoji} {meta.label}</p>
-          <h1 className="text-white text-3xl font-extrabold mb-2 leading-tight" style={{ fontFamily: "'Space Grotesk',sans-serif" }}>
-            {meta.label} Recalls
-          </h1>
-          <p className="text-white/75 text-sm">{meta.desc}</p>
+      <section className="cat-hero px-4 pt-4 pb-8">
+        <div className="max-w-3xl mx-auto">
+          <Link href="/" className="tap gap-1 px-4 rounded-full border border-white/25 text-white text-sm hover:bg-white/10" style={{ background: 'rgba(26,0,45,0.45)' }}>
+            ← Back to Feed
+          </Link>
+          <div className="flex items-center gap-4 mt-4">
+            <div className="flex-1 min-w-0">
+              <p className="text-yellow text-xs font-bold uppercase tracking-widest mb-2">{meta.emoji} {meta.label}</p>
+              <h1 className="text-white text-3xl font-extrabold mb-2 leading-tight tracking-tight" style={{ fontFamily: "'Space Grotesk',sans-serif" }}>
+                {meta.label} Recalls
+              </h1>
+              <p className="text-white/80 text-sm">{meta.desc}</p>
+            </div>
+            <Image
+              src="/images/scout-full.webp"
+              alt={`Scout — ${meta.label}`}
+              width={150} height={150}
+              className="flex-shrink-0 rounded-2xl rotate-2 shadow-2xl"
+              style={{ width: 'min(132px, 27vw)', height: 'auto' }}
+            />
+          </div>
         </div>
-        <Image
-          src="/images/scout-full.webp"
-          alt={`Scout — ${meta.label}`}
-          width={150} height={150}
-          className="flex-shrink-0 drop-shadow-2xl"
-          style={{ width: 'min(150px, 38vw)', height: 'auto' }}
-        />
       </section>
 
       <div className="max-w-3xl mx-auto px-4 py-6 space-y-10">
@@ -76,13 +80,13 @@ export default function CategoryPage({ params }: { params: Promise<{ slug: strin
           {loading && (
             <div className="space-y-3">
               {Array.from({ length: 4 }).map((_, i) => (
-                <div key={i} className="h-20 rounded-xl bg-muted animate-pulse" />
+                <div key={i} className="h-28 rounded-xl bg-white/5 animate-pulse" />
               ))}
             </div>
           )}
 
           {!loading && recalls.length === 0 && (
-            <div className="text-center py-12 text-muted-foreground">
+            <div className="text-center py-12 text-white/60">
               <div className="text-4xl mb-3">🐾</div>
               <p>No recent recalls in this category — Scout is keeping watch!</p>
             </div>
@@ -90,24 +94,35 @@ export default function CategoryPage({ params }: { params: Promise<{ slug: strin
 
           <div className="space-y-3">
             {recalls.map(r => (
-              <div key={r.id} className="bg-card border border-border rounded-xl p-4 flex gap-3 items-start hover:shadow-md transition-shadow">
-                <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center text-xl flex-shrink-0">
-                  {meta.emoji}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-start gap-2 flex-wrap mb-1">
-                    <span className="font-bold text-sm leading-tight" style={{ fontFamily: "'Space Grotesk',sans-serif" }}>{r.title}</span>
-                    <span className="text-xs font-bold px-2 py-0.5 rounded-full flex-shrink-0" style={{ background: sevColor[r.severity], color: r.severity === 'medium' ? '#1A002D' : 'white' }}>
-                      {r.severity}
+              <div
+                key={r.id}
+                className="recall-card pl-5 pr-4 py-4 flex flex-col sm:flex-row gap-3 sm:items-start"
+              >
+                <button
+                  type="button"
+                  onClick={() => setSelected(r)}
+                  aria-label={`More info: ${r.title}`}
+                  className="vhs-open flex gap-3 items-start flex-1 min-w-0 text-left"
+                >
+                  <span className="w-11 h-11 rounded-xl flex items-center justify-center text-xl flex-shrink-0" style={{ background: `${meta.color}26`, boxShadow: `inset 0 0 0 1px ${meta.color}80` }} aria-hidden="true">
+                    {meta.emoji}
+                  </span>
+                  <span className="block flex-1 min-w-0">
+                    <span className="flex items-center gap-2 flex-wrap mb-2">
+                      <span className="sev-pill" data-on-dark="" data-sev={r.severity}>{sevLabel[r.severity] ?? r.severity}</span>
+                      <span className="text-white/60 text-xs">{r.dateFormatted}</span>
                     </span>
-                  </div>
-                  <p className="text-muted-foreground text-xs mb-2">⚠️ {r.hazard}</p>
-                  <div className="text-muted-foreground text-xs">📅 {r.dateFormatted}</div>
-                </div>
-                <div className="flex flex-col gap-1.5 flex-shrink-0">
+                    <span className="block font-bold text-[15px] leading-snug mb-1.5 line-clamp-3" style={{ fontFamily: "'Space Grotesk',sans-serif" }}>{r.title}</span>
+                    <span className="block text-white/70 text-[13px] leading-relaxed line-clamp-3">{r.hazard}</span>
+                    <span className="block mt-2 text-yellow text-xs font-bold">More info <span aria-hidden="true">›</span></span>
+                  </span>
+                </button>
+                <div className="flex sm:flex-col gap-2 flex-shrink-0 sm:w-28">
                   <button
+                    type="button"
+                    aria-pressed={!!added[r.id]}
                     onClick={() => toggle({ id: r.id, title: r.title, category: r.category, severity: r.severity, date: r.dateFormatted, url: r.url })}
-                    className="px-3 py-1.5 rounded-full text-xs font-semibold text-white transition-colors"
+                    className="tap flex-1 px-4 rounded-full text-sm text-white"
                     style={{ background: added[r.id] ? '#259A36' : '#FF2B85' }}
                   >
                     {added[r.id] ? '✓ Added' : '+ Add'}
@@ -116,7 +131,7 @@ export default function CategoryPage({ params }: { params: Promise<{ slug: strin
                     href={r.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="px-3 py-1.5 rounded-full text-xs font-medium border border-border text-muted-foreground hover:bg-muted transition-colors text-center"
+                    className="tap flex-1 px-4 rounded-full text-sm border border-white/25 text-white/80 hover:bg-white/10"
                   >
                     Official ↗
                   </a>
@@ -132,21 +147,21 @@ export default function CategoryPage({ params }: { params: Promise<{ slug: strin
             My {meta.label} Watchlist
           </h2>
           {listItems.length === 0 ? (
-            <div className="border-2 border-dashed border-border rounded-xl p-8 text-center text-muted-foreground">
+            <div className="border-2 border-dashed border-white/20 rounded-xl p-8 text-center text-white/60">
               <div className="text-3xl mb-2">🐾</div>
               <p className="text-sm">Nothing added yet. Tap <strong>+ Add</strong> on any recall above.</p>
             </div>
           ) : (
             <div className="space-y-2">
               {listItems.map(item => (
-                <div key={item.id} className="bg-card border border-border rounded-xl px-4 py-3 flex items-center gap-3">
+                <div key={item.id} className="recall-card pl-5 pr-2 py-1.5 flex items-center gap-3">
                   <div className="flex-1 font-semibold text-sm truncate">{item.title}</div>
-                  <span className="text-xs font-bold px-2 py-0.5 rounded-full flex-shrink-0" style={{ background: sevColor[item.severity as keyof typeof sevColor] ?? '#ccc', color: item.severity === 'medium' ? '#1A002D' : 'white' }}>
-                    {item.severity}
-                  </span>
+                  <span className="sev-pill flex-shrink-0" data-on-dark="" data-sev={item.severity}>{item.severity}</span>
                   <button
+                    type="button"
+                    aria-label={`Remove ${item.title} from watchlist`}
                     onClick={() => toggle(item)}
-                    className="w-6 h-6 rounded-full bg-muted text-muted-foreground hover:bg-magenta hover:text-white transition-colors flex items-center justify-center text-sm flex-shrink-0"
+                    className="tap w-11 h-11 rounded-full text-white/60 text-xl hover:bg-magenta hover:text-white flex-shrink-0"
                   >
                     ×
                   </button>
@@ -156,6 +171,15 @@ export default function CategoryPage({ params }: { params: Promise<{ slug: strin
           )}
         </section>
       </div>
-    </>
+
+      {selected && (
+        <RecallSheet
+          recall={selected}
+          isAdded={!!added[selected.id]}
+          onToggle={() => toggle({ id: selected.id, title: selected.title, category: selected.category, severity: selected.severity, date: selected.dateFormatted, url: selected.url })}
+          onClose={() => setSelected(null)}
+        />
+      )}
+    </div>
   );
 }
