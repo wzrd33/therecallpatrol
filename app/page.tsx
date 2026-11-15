@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import type { Recall } from '@/types/recalls';
@@ -15,6 +15,7 @@ const CATEGORIES = [
   { slug: 'pets',         label: 'Pets',      emoji: '🐾', color: '#FF2B85' },
 ];
 
+const CAROUSEL_LIMIT = 30;
 const sevLabel = { high: '⚠ High', medium: 'Medium', low: 'Low' };
 
 export default function HomePage() {
@@ -31,6 +32,12 @@ export default function HomePage() {
       .then(d => { setRecalls(d.recalls ?? []); setLoading(false); })
       .catch(() => { setError(true); setLoading(false); });
   }, []);
+
+  // Carousel shows only the newest recalls; category counts below still use the full list
+  const latest = useMemo(
+    () => [...recalls].sort((a, b) => b.date.localeCompare(a.date)).slice(0, CAROUSEL_LIMIT),
+    [recalls],
+  );
 
   const scroll = (dir: number) => {
     trackRef.current?.scrollBy({ left: dir * 340, behavior: 'smooth' });
@@ -109,7 +116,7 @@ export default function HomePage() {
               ref={trackRef}
               className="vhs-track flex gap-3 overflow-x-auto px-4 pt-3 pb-5 scroll-px-4"
             >
-              {recalls.map(r => (
+              {latest.map(r => (
                 <div
                   key={r.id}
                   data-sev={r.severity}
