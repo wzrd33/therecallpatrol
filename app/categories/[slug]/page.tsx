@@ -23,19 +23,20 @@ export default function CategoryPage({ params }: { params: Promise<{ slug: strin
 
   const [recalls, setRecalls] = useState<Recall[]>([]);
   const [loading, setLoading] = useState(true);
+  const [failed, setFailed] = useState(false);
   const { added, toggle, getByCategory } = useLists();
   const [selected, setSelected] = useState<Recall | null>(null);
   const [listItems, setListItems] = useState<ReturnType<typeof getByCategory>>([]);
 
   useEffect(() => {
     fetch('/api/recalls')
-      .then(r => r.json())
+      .then(r => { if (!r.ok) throw new Error('recalls unavailable'); return r.json(); })
       .then(d => {
         const all: Recall[] = d.recalls ?? [];
         setRecalls(all.filter(r => r.category === slug));
         setLoading(false);
       })
-      .catch(() => setLoading(false));
+      .catch(() => { setFailed(true); setLoading(false); });
   }, [slug]);
 
   useEffect(() => {
@@ -74,7 +75,7 @@ export default function CategoryPage({ params }: { params: Promise<{ slug: strin
         {/* Recall list */}
         <section>
           <h2 className="font-bold text-base mb-3" style={{ fontFamily: "'Space Grotesk',sans-serif" }}>
-            {loading ? 'Loading recalls…' : `${recalls.length} recent ${meta.label.toLowerCase()} recalls`}
+            {loading ? 'Loading recalls…' : failed ? 'Recalls are unavailable right now' : `${recalls.length} recent ${meta.label.toLowerCase()} recalls`}
           </h2>
 
           {loading && (
@@ -85,7 +86,11 @@ export default function CategoryPage({ params }: { params: Promise<{ slug: strin
             </div>
           )}
 
-          {!loading && recalls.length === 0 && (
+          {failed && (
+            <p className="text-white/60 text-sm py-6">Scout could not reach the recall database. Try again in a few minutes.</p>
+          )}
+
+          {!loading && !failed && recalls.length === 0 && (
             <div className="text-center py-12 text-white/60">
               <div className="text-4xl mb-3">🐾</div>
               <p>No recent recalls in this category. Scout is keeping watch.</p>

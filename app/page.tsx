@@ -34,7 +34,7 @@ export default function HomePage() {
 
   useEffect(() => {
     fetch('/api/recalls')
-      .then(r => r.json())
+      .then(r => { if (!r.ok) throw new Error('recalls unavailable'); return r.json(); })
       .then(d => { setRecalls(d.recalls ?? []); setLoading(false); })
       .catch(() => { setError(true); setLoading(false); });
   }, []);

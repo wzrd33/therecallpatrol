@@ -24,7 +24,7 @@ export function ProductSearch() {
     let cancelled = false;
     setFailed(false);
     fetch('/api/recalls')
-      .then(r => r.json())
+      .then(r => { if (!r.ok) throw new Error('recalls unavailable'); return r.json(); })
       .then(d => { if (!cancelled) setRecalls(d.recalls ?? []); })
       .catch(() => { if (!cancelled) setFailed(true); });
     return () => { cancelled = true; };

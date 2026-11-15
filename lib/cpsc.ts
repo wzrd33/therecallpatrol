@@ -35,19 +35,56 @@ function formatDate(s: string): string {
 export async function fetchRecalls(): Promise<Recall[]> {
   if (_cache && Date.now() - _cache.ts < TTL) return _cache.data;
 
-  // Limit to 2 years to avoid downloading the full 37MB response (10k+ records)
-  const since = new Date();
-  since.setFullYear(since.getFullYear() - 2);
-  const dateParam = since.toISOString().split('T')[0];
+  try {
+    const [primary, fallback] = sinceDates();
+    // A query CPSC has not seen before takes close to a minute; one it has seen answers
+    // in under a second. So wait a long time on the main query, then fall back to last
+    // month's query, which CPSC has usually already computed.
+    const fresh = await fetchFromCpsc(primary, 50_000).catch(() => fetchFromCpsc(fallback, 8_000));
+    _cache = { data: fresh, ts: Date.now() };
+    return fresh;
+  } catch (err) {
+    // CPSC is slow or down: keep serving the last good list rather than nothing
+    if (_cache) {
+      console.error('CPSC fetch failed, serving last good list:', err);
+      return _cache.data;
+    }
+    throw err;
+  }
+}
+
+/**
+ * Start dates for the query: the 1st of the month two years back, and the month before.
+ * CPSC caches each distinct query (errors included), so a date that changed every day
+ * meant a slow, uncached query every day. Pinning to the month keeps the query the same.
+ */
+function sinceDates(): [string, string] {
+  const now = new Date();
+  const iso = (monthsBack: number) =>
+    new Date(Date.UTC(now.getUTCFullYear() - 2, now.getUTCMonth() - monthsBack, 1)).toISOString().split('T')[0];
+  return [iso(0), iso(1)];
+}
+
+async function fetchFromCpsc(dateParam: string, timeoutMs: number): Promise<Recall[]> {
+  // Limit to about 2 years to avoid downloading the full 37MB response (10k+ records)
   const url = `https://www.saferproducts.gov/RestWebServices/Recall?format=json&RecallDateStart=${dateParam}`;
 
   const res = await fetch(url, {
     cache: 'no-store',
-    signal: AbortSignal.timeout(15000),
+    signal: AbortSignal.timeout(timeoutMs),
   });
   if (!res.ok) throw new Error(`CPSC API ${res.status}`);
 
-  const data: any[] = await res.json();
+  const raw: unknown = await res.json();
+  if (!Array.isArray(raw)) throw new Error('CPSC API returned a non-list response');
+
+  // When its database is down, CPSC answers 200 with a single pseudo-record whose
+  // title is the error message. Real recalls always carry a RecallID and a date.
+  const data: any[] = raw.filter(item => item && item.RecallID && item.RecallDate);
+  if (data.length === 0) {
+    throw new Error(`CPSC API returned no valid recalls: ${String(raw[0]?.Title ?? 'empty list').slice(0, 120)}`);
+  }
+
   const slice = data.slice(0, 1000);
 
   const recalls = slice.map((item: any, i: number) => {
@@ -71,6 +108,5 @@ export async function fetchRecalls(): Promise<Recall[]> {
     };
   });
 
-  _cache = { data: recalls, ts: Date.now() };
   return recalls;
 }
