@@ -96,8 +96,8 @@ export function RecallSheet({ recall, isAdded, onToggle, onClose }: {
             type="button"
             aria-pressed={isAdded}
             onClick={onToggle}
-            className="tap flex-1 rounded-full text-sm text-white px-4"
-            style={{ background: isAdded ? '#259A36' : '#FF2B85' }}
+            data-added={isAdded}
+            className="tap add-btn flex-1 rounded-full text-sm px-4"
           >
             {isAdded ? '✓ On my watchlist' : '+ Add to watchlist'}
           </button>

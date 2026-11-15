@@ -122,8 +122,8 @@ export default function CategoryPage({ params }: { params: Promise<{ slug: strin
                     type="button"
                     aria-pressed={!!added[r.id]}
                     onClick={() => toggle({ id: r.id, title: r.title, category: r.category, severity: r.severity, date: r.dateFormatted, url: r.url })}
-                    className="tap flex-1 px-4 rounded-full text-sm text-white"
-                    style={{ background: added[r.id] ? '#259A36' : '#FF2B85' }}
+                    data-added={!!added[r.id]}
+                    className="tap add-btn flex-1 px-4 rounded-full text-sm"
                   >
                     {added[r.id] ? '✓ Added' : '+ Add'}
                   </button>
@@ -131,7 +131,7 @@ export default function CategoryPage({ params }: { params: Promise<{ slug: strin
                     href={r.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="tap flex-1 px-4 rounded-full text-sm border border-white/25 text-white/80 hover:bg-white/10"
+                    className="tap flex-1 px-4 rounded-full text-sm text-white/70 hover:bg-white/10 hover:text-white"
                   >
                     Official ↗
                   </a>
