@@ -7,8 +7,11 @@ const TTL = 5 * 60 * 1000;
 const HIGH = ['death', 'fatal', 'fire', 'burn', 'explosion', 'electrocution', 'suffocation', 'strangulation', 'drowning'];
 const MED  = ['injury', 'fall', 'choking', 'laceration', 'fracture', 'salmonella', 'listeria', 'contamination', 'lead', 'hazard'];
 
-function severity(hazard: string, desc: string): Severity {
-  const t = `${hazard} ${desc}`.toLowerCase();
+// The headline is where CPSC states the risk ("Risk of Serious Injury or Death from..."),
+// so it is graded along with the hazard text. The hazard text alone is sometimes just
+// "None reported" or a note about which rule the product breaks.
+function severity(title: string, hazard: string, desc: string): Severity {
+  const t = `${title} ${hazard} ${desc}`.toLowerCase();
   if (HIGH.some(w => t.includes(w))) return 'high';
   if (MED.some(w => t.includes(w))) return 'medium';
   return 'low';
@@ -41,6 +44,17 @@ function category(_type: string, title: string, product: string): Category {
   // Everything left is something that lives around the house: furniture, heaters,
   // power banks, lighting, tools, cleaners, personal care.
   return 'household';
+}
+
+/** CPSC occasionally sends a link with a slash missing ("https:/www.cpsc.gov/..."). */
+function officialUrl(raw: unknown): string {
+  const fallback = 'https://www.cpsc.gov/Recalls';
+  if (typeof raw !== 'string' || !raw.trim()) return fallback;
+  const fixed = raw.trim().replace(/^https?:\/+/i, 'https://');
+  try {
+    const u = new URL(fixed);
+    return /(^|\.)cpsc\.gov$/i.test(u.hostname) || /(^|\.)saferproducts\.gov$/i.test(u.hostname) ? u.toString() : fallback;
+  } catch { return fallback; }
 }
 
 function formatDate(s: string): string {
@@ -119,9 +133,9 @@ async function fetchFromCpsc(dateParam: string, timeoutMs: number): Promise<Reca
       hazard,
       date:          item.RecallDate ?? '',
       dateFormatted: formatDate(item.RecallDate ?? ''),
-      severity:      severity(hazard, description),
+      severity:      severity(title, hazard, description),
       category:      category(productType, title, productName),
-      url:           item.URL ?? 'https://www.cpsc.gov/Recalls',
+      url:           officialUrl(item.URL),
       description,
       products:      productName,
     };

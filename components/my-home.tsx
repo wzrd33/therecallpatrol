@@ -3,13 +3,17 @@
 import { useState } from 'react';
 import type { Recall } from '@/types/recalls';
 import type { HomeItem } from '@/hooks/use-home-items';
+import type { OwnedMatch } from '@/utils/recall-match';
+import { recallName } from '@/utils/recall-name';
 
 const EXAMPLES = ['Baby stroller', 'Space heater', 'Air fryer', 'Power bank'];
 
-export function MyHome({ items, matches, loading, onAdd, onRemove, onOpen }: {
+export function MyHome({ items, matches, loading, coverage, onAdd, onRemove, onOpen }: {
   items: HomeItem[];
-  matches: Record<string, Recall[]>;
+  matches: Record<string, OwnedMatch[]>;
   loading: boolean;
+  /** What was searched, e.g. "981 CPSC recalls, Nov 2024 to Nov 2026" */
+  coverage: string;
   onAdd: (name: string) => void;
   onRemove: (id: string) => void;
   onOpen: (r: Recall) => void;
@@ -22,10 +26,10 @@ export function MyHome({ items, matches, loading, onAdd, onRemove, onOpen }: {
   const summary = loading
     ? 'Scout is checking your list…'
     : items.length === 0
-      ? 'List the things you own. Scout checks them against every recall each time you visit.'
+      ? 'List the things you own, with the model number if you have it. Scout checks them each time you visit.'
       : alerts > 0
-        ? `${alerts} of your ${items.length} ${items.length === 1 ? 'thing' : 'things'} may be affected. Tap to see why.`
-        : `Scout checked ${items.length} ${items.length === 1 ? 'thing' : 'things'}. All clear.`;
+        ? `${alerts} of your ${items.length} ${items.length === 1 ? 'thing' : 'things'} may be affected. Tap to compare the details.`
+        : `Scout checked ${items.length} ${items.length === 1 ? 'thing' : 'things'}. No matching recalls found in our current records.`;
 
   return (
     <section id="my-home" className="panel scroll-mt-20" aria-labelledby="my-home-title">
@@ -41,7 +45,7 @@ export function MyHome({ items, matches, loading, onAdd, onRemove, onOpen }: {
           type="text"
           value={draft}
           onChange={e => setDraft(e.target.value)}
-          placeholder="e.g. Graco stroller"
+          placeholder="e.g. Gourmia air fryer GTF7530"
           aria-label="A product you own"
           maxLength={60}
           autoComplete="off"
@@ -81,18 +85,23 @@ export function MyHome({ items, matches, loading, onAdd, onRemove, onOpen }: {
                       ⚠ {hits.length} {hits.length === 1 ? 'recall' : 'recalls'} {open ? '▴' : '▾'}
                     </button>
                   ) : (
-                    <span className="text-[#5fe08a] text-xs font-bold whitespace-nowrap">✓ Clear</span>
+                    <span className="text-white/60 text-xs font-bold whitespace-nowrap">No match found</span>
                   )}
                   <button type="button" aria-label={`Remove ${item.name}`} onClick={() => onRemove(item.id)} className="tap w-11 h-11 rounded-full text-white/50 text-xl hover:bg-white/10 hover:text-white flex-shrink-0">×</button>
                 </div>
                 {open && hits.length > 0 && (
                   <ul className="pb-2 pl-1 space-y-1">
-                    {hits.slice(0, 8).map(r => (
+                    {hits.slice(0, 8).map(({ recall: r, kind, model }) => (
                       <li key={r.id}>
                         <button type="button" onClick={() => onOpen(r)} className="search-hit !min-h-[44px] !py-2">
                           <span className="block flex-1 min-w-0">
-                            <span className="block text-white text-[13px] font-semibold leading-snug line-clamp-2">{r.products || r.title}</span>
-                            <span className="block text-white/55 text-xs mt-0.5">{r.dateFormatted}</span>
+                            <span className="block text-white text-[13px] font-semibold leading-snug line-clamp-2">{[recallName(r).brand, recallName(r).product].filter(Boolean).join(' ')}</span>
+                            <span className={`block text-xs mt-0.5 ${kind === 'model' ? 'text-magenta font-bold' : 'text-white/55'}`}>
+                              {kind === 'model'
+                                ? `Model ${model} is named in this recall. Confirm the serial or date range.`
+                                : 'Same name. Compare the model number on the notice.'}
+                            </span>
+                            <span className="block text-white/45 text-xs mt-0.5">{r.dateFormatted}</span>
                           </span>
                           <span className="text-yellow text-lg flex-shrink-0" aria-hidden="true">›</span>
                         </button>
@@ -107,7 +116,9 @@ export function MyHome({ items, matches, loading, onAdd, onRemove, onOpen }: {
         </ul>
       )}
 
-      <p className="text-white/45 text-xs mt-3">Saved on this device only. Matches are by name, so confirm the model on the official notice.</p>
+      <p className="text-white/45 text-xs mt-3">
+        {coverage ? `Checked against ${coverage}. ` : ''}Older recalls and food, drug and vehicle recalls are not covered, so no match is not a guarantee that a product is safe. Your list is saved on this device only.
+      </p>
     </section>
   );
 }

@@ -11,7 +11,7 @@ import { MyHome } from '@/components/my-home';
 import { RecallOfDay, pickRecallOfDay } from '@/components/recall-of-day';
 import { usePatrol } from '@/hooks/use-patrol';
 import { useHomeItems } from '@/hooks/use-home-items';
-import { findOwnedMatches } from '@/utils/recall-match';
+import { findOwnedMatchesDetailed, type OwnedMatch } from '@/utils/recall-match';
 import { recallName, dailyLineup } from '@/utils/recall-name';
 
 const CATEGORIES = [
@@ -52,10 +52,17 @@ export default function HomePage() {
   const patrol = usePatrol(recalls);
   const { items: homeItems, addItem, removeItem } = useHomeItems();
   const homeMatches = useMemo(() => {
-    const out: Record<string, Recall[]> = {};
-    homeItems.forEach(i => { out[i.id] = findOwnedMatches(recalls, i.name); });
+    const out: Record<string, OwnedMatch[]> = {};
+    homeItems.forEach(i => { out[i.id] = findOwnedMatchesDetailed(recalls, i.name); });
     return out;
   }, [homeItems, recalls]);
+  // What the household check actually covered, shown beside every result
+  const coverage = useMemo(() => {
+    if (recalls.length === 0) return '';
+    const dates = recalls.map(r => r.date).filter(Boolean).sort();
+    const fmt = (d: string) => new Date(d).toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+    return `${recalls.length} CPSC recalls, ${fmt(dates[0])} to ${fmt(dates[dates.length - 1])}`;
+  }, [recalls]);
   const homeAlerts = homeItems.filter(i => homeMatches[i.id]?.length > 0).length;
   const recallOfDay = useMemo(() => pickRecallOfDay(recalls), [recalls]);
 
@@ -96,7 +103,7 @@ export default function HomePage() {
             <span className="text-magenta">Guard Your Home.</span>
           </h1>
           <p className="text-white/70 mb-6 text-base max-w-md mx-auto">
-            Real-time alerts on recalled products: food, toys, appliances, and more.
+            Check what you own against U.S. consumer product recalls: toys, appliances, furniture, and more.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center max-w-xs sm:max-w-none mx-auto">
             {patrol.nickname
@@ -221,7 +228,7 @@ export default function HomePage() {
         <section className="bg-navy border-t border-white/10 px-4 py-8">
           <div className="max-w-6xl mx-auto grid gap-4 lg:grid-cols-2 items-start">
             <RecallOfDay recall={recallOfDay} onOpen={setSelected} />
-            <MyHome items={homeItems} matches={homeMatches} loading={loading} onAdd={addItem} onRemove={removeItem} onOpen={setSelected} />
+            <MyHome items={homeItems} matches={homeMatches} loading={loading} coverage={coverage} onAdd={addItem} onRemove={removeItem} onOpen={setSelected} />
           </div>
         </section>
       )}

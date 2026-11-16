@@ -8,10 +8,10 @@ import './globals.css';
 export const metadata: Metadata = {
   metadataBase: new URL('https://therecallpatrol.com'),
   title: 'Recall Patrol | Guard Your Home',
-  description: 'Real-time alerts on recalled products: food, toys, appliances, and more. Free household safety tracking.',
+  description: 'Check what you own against U.S. consumer product recalls: toys, appliances, furniture, and more. Free household safety tracking.',
   openGraph: {
     title: 'Recall Patrol | Guard Your Home',
-    description: 'Real-time alerts on recalled products for your household.',
+    description: 'Check what you own against U.S. consumer product recalls.',
     url: 'https://therecallpatrol.com',
     siteName: 'Recall Patrol',
     type: 'website',
@@ -55,7 +55,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <Image src="/images/scout-logo.webp" alt="Scout" width={28} height={28} className="rounded-md opacity-70" />
               <span>Recall Patrol. Keeping households safe.</span>
             </div>
-            <span>© {new Date().getFullYear()} therecallpatrol.com</span>
+            <span className="text-center sm:text-right">
+              Recall data from the U.S. Consumer Product Safety Commission, last two years.<br />
+              © {new Date().getFullYear()} therecallpatrol.com
+            </span>
           </div>
         </footer>
       </body>

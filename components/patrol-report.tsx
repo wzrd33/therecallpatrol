@@ -39,11 +39,11 @@ export function PatrolReport({ ready, firstVisit, newCount, lastVisit, streak, n
         </span>
       </a>
       <a href="#my-home" className="patrol-stat">
-        <span className="patrol-num" data-tone={homeAlerts > 0 ? 'alert' : homeCount > 0 ? 'clear' : undefined}>
-          {homeCount === 0 ? '+' : homeAlerts > 0 ? homeAlerts : '✓'}
+        <span className="patrol-num" data-tone={homeAlerts > 0 ? 'alert' : undefined}>
+          {homeCount === 0 ? '+' : homeAlerts > 0 ? homeAlerts : '0'}
         </span>
         <span className="patrol-label">
-          {homeCount === 0 ? 'My Home' : homeAlerts > 0 ? (homeAlerts === 1 ? 'Thing to check' : 'Things to check') : 'All clear'}
+          {homeCount === 0 ? 'My Home' : homeAlerts > 0 ? (homeAlerts === 1 ? 'Thing to check' : 'Things to check') : 'No matches found'}
           <span className="patrol-sub">
             {homeCount === 0 ? 'Add what you own' : `Scout checked ${homeCount} of your ${homeCount === 1 ? 'thing' : 'things'}`}
           </span>
