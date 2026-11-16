@@ -25,29 +25,33 @@ export default function AboutPage() {
 
         <H2>Where the data comes from</H2>
         <p>
-          Every recall on this site comes from the U.S. Consumer Product Safety Commission (CPSC) public recall
-          database. Each one links to the official CPSC notice, which is the final word on which models are
-          affected and what the remedy is. Recall Patrol is independent and is not affiliated with CPSC.
+          Product recalls come from the U.S. Consumer Product Safety Commission (CPSC) public recall database,
+          and each one links to its official CPSC notice. Food recalls come from the U.S. Food and Drug
+          Administration (FDA) through its openFDA service, and each one links to its FDA enforcement report. The official
+          notice is the final word on what is affected and what the remedy is. Recall Patrol is independent
+          and is not affiliated with either agency.
         </p>
 
         <H2>What is covered</H2>
         <ul className="list-disc pl-5 space-y-1">
           <li>Consumer products: toys, baby gear, furniture, appliances, electronics, tools, and outdoor gear.</li>
-          <li>Recalls announced in roughly the last two years.</li>
-          <li>The list refreshes several times an hour when CPSC is reachable.</li>
+          <li>Product recalls announced in roughly the last two years. The list refreshes several times an hour when CPSC is reachable.</li>
+          <li>Food and dietary supplements regulated by FDA, from roughly the last eight months.</li>
+          <li>FDA publishes its recall reports weekly, so a food recall can be in the news a few days before it appears here.</li>
         </ul>
 
         <H2>What is not covered</H2>
         <ul className="list-disc pl-5 space-y-1">
-          <li>Food, medicine, cosmetics, cars, car seats, and boats. Other agencies run those recalls.</li>
-          <li>Recalls older than about two years.</li>
+          <li>Meat, poultry and egg products, which the USDA handles.</li>
+          <li>Medicine, medical devices, cosmetics, cars, car seats, and boats.</li>
+          <li>Product recalls older than about two years, and food recalls older than about eight months.</li>
           <li>Recalls outside the United States.</li>
         </ul>
 
         <H2>How My Home matches your products</H2>
         <p>
           When you add a product, Scout compares the words you typed with each recall&apos;s product name and headline.
-          If you include a model number, he also looks for it in the recall&apos;s description. A model match is
+          If you include a model number or lot code, he also looks for it in the recall&apos;s description. A model match is
           a strong signal. A name match means the brand and product type line up, and you should compare the
           model number on the official notice.
         </p>
@@ -57,9 +61,9 @@ export default function AboutPage() {
 
         <H2>How hazard labels work</H2>
         <p>
-          The label on each recall, such as Fire, Choking or Tip-over, is taken from the hazard CPSC names in its
-          own headline. The colour shows how serious CPSC&apos;s wording is: most recalls mention a risk of
-          serious injury or death and are marked accordingly.
+          The label on each recall, such as Fire, Choking, Salmonella or Allergen, is taken from the hazard the
+          agency names. For products, the colour shows how serious CPSC&apos;s wording is. For food, it follows
+          FDA&apos;s own rating: Class I is the most serious, Class III the least.
         </p>
 
         <H2>Alerts</H2>

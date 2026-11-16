@@ -2,8 +2,27 @@
 
 import { useEffect, useRef } from 'react';
 import type { Recall } from '@/types/recalls';
-import { recallName, hazardTag } from '@/utils/recall-name';
+import { recallName, hazardTag, recallSource } from '@/utils/recall-name';
 
+
+const FOOD_EMOJI: [RegExp, string][] = [
+  [/ice cream|gelato/, '🍨'],
+  [/cheese|queso/, '🧀'],
+  [/milk|yogurt|dairy/, '🥛'],
+  [/popcorn/, '🍿'],
+  [/chips|crisps|snack/, '🥨'],
+  [/cookie|brownie|cake|muffin|pastry|donut/, '🍪'],
+  [/chocolate|candy|gumm/, '🍫'],
+  [/bread|bagel|tortilla|bun\b/, '🍞'],
+  [/salad|sprouts|lettuce|spinach|cucumber|vegetable/, '🥗'],
+  [/noodle|ramen|pasta/, '🍜'],
+  [/peanut|nut\b|nuts\b|almond|pistachio/, '🥜'],
+  [/\beggs?\b/, '🥚'],
+  [/salmon\b|shrimp|fish|seafood|oyster|tuna/, '🐟'],
+  [/juice|drink|beverage|tea\b|coffee|water/, '🧃'],
+  [/sauce|salsa|hummus|dip\b|honey|jelly|jam\b/, '🍯'],
+  [/supplement|vitamin|capsule|tablet/, '💊'],
+];
 
 const PRODUCT_EMOJI: [RegExp, string][] = [
   [/toy|doll|plush|playset|game/, '🧸'],
@@ -35,6 +54,10 @@ const PRODUCT_EMOJI: [RegExp, string][] = [
 
 export function recallEmoji(r: Recall): string {
   const t = r.title.toLowerCase();
+  if (String(r.id).startsWith('fda-')) {
+    for (const [re, emoji] of FOOD_EMOJI) if (re.test(t)) return emoji;
+    return r.category === 'refrigerator' ? '🧊' : '🥫';
+  }
   // Picture the product itself where the name makes it obvious
   const subject = t.split(/ due | recalled /)[0];
   for (const [re, emoji] of PRODUCT_EMOJI) if (re.test(subject)) return emoji;
@@ -100,7 +123,7 @@ export function RecallSheet({ recall, isAdded, onToggle, onClose }: {
           <div className="flex items-center gap-2 flex-wrap mb-3">
             <span className="sev-pill" data-sev={recall.severity} data-on-dark="">{name.hazard || hazardTag(recall.title)}</span>
             <span className="text-cyan-light text-xs font-bold uppercase tracking-wider">{recall.category === 'other' ? 'outdoors' : recall.category}</span>
-            <span className="text-white/60 text-xs">· {recall.dateFormatted}</span>
+            <span className="text-white/60 text-xs">· {recall.dateFormatted} · {recallSource(recall).short}</span>
           </div>
           {name.brand && <p className="text-cyan-light text-xs font-bold uppercase tracking-wider mb-1">{name.brand}</p>}
           <h3 id="recall-sheet-title" className="text-white text-2xl font-extrabold leading-tight tracking-tight mb-2" style={{ fontFamily: "'Space Grotesk',sans-serif" }}>
@@ -123,6 +146,7 @@ export function RecallSheet({ recall, isAdded, onToggle, onClose }: {
             <div className="mb-2">
               <p className="sheet-label">How to identify it</p>
               <p className="text-white/80 text-sm leading-relaxed whitespace-pre-line">{recall.description}</p>
+              <p className="text-white/50 text-xs mt-3">Source: {recallSource(recall).name}.</p>
             </div>
           )}
         </div>

@@ -60,7 +60,9 @@ export default function HomePage() {
     if (recalls.length === 0) return '';
     const dates = recalls.map(r => r.date).filter(Boolean).sort();
     const fmt = (d: string) => new Date(d).toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
-    return `${recalls.length} CPSC recalls, ${fmt(dates[0])} to ${fmt(dates[dates.length - 1])}`;
+    const food = recalls.filter(r => String(r.id).startsWith('fda-')).length;
+    const products = recalls.length - food;
+    return `${products} CPSC product recalls${food > 0 ? ` and ${food} FDA food recalls` : ''}, ${fmt(dates[0])} to ${fmt(dates[dates.length - 1])}`;
   }, [recalls]);
   const homeAlerts = homeItems.filter(i => homeMatches[i.id]?.length > 0).length;
   const recallOfDay = useMemo(() => pickRecallOfDay(recalls), [recalls]);
@@ -102,7 +104,7 @@ export default function HomePage() {
             <span className="text-magenta">Guard Your Home.</span>
           </h1>
           <p className="text-white/70 mb-6 text-base max-w-md mx-auto">
-            Check what you own against U.S. consumer product recalls: toys, appliances, furniture, and more.
+            Check what you own against U.S. recalls: food, toys, appliances, furniture, and more.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center max-w-xs sm:max-w-none mx-auto">
             {patrol.nickname

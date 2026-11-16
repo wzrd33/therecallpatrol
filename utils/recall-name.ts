@@ -28,7 +28,8 @@ function tidyProduct(raw: string): string {
 }
 
 function tidyHazard(raw: string): string {
-  let h = raw.split(/[;.]/)[0];
+  // Stop at a semicolon or the end of a sentence, but not inside "E. coli"
+  let h = raw.split(/;|\.(?=\s+[A-Z]|\s*$)/)[0];
   const from = h.toLowerCase().lastIndexOf(' from ');
   if (from >= 0) h = h.slice(from + 6);
   h = h
@@ -120,6 +121,20 @@ export function dailyLineup(recalls: Recall[], limit: number, fresh = 8, day = n
 }
 
 const HAZARD_TAGS: [RegExp, string][] = [
+  [/salmonella/, 'Salmonella'],
+  [/listeria/, 'Listeria'],
+  [/e\. ?coli/, 'E. coli'],
+  [/botul/, 'Botulism'],
+  [/hepatitis/, 'Hepatitis A'],
+  [/undeclared drug/, 'Hidden drug'],
+  [/undeclared (?:ingredient|sugar|color|dye)/, 'Labeling'],
+  [/undeclared|allergen/, 'Allergen'],
+  [/foreign material/, 'Foreign object'],
+  [/heavy metals/, 'Heavy metals'],
+  [/spoilage/, 'Spoilage'],
+  [/unsafe processing/, 'Processing'],
+  [/labeling error/, 'Labeling'],
+  [/safety concern/, 'Safety'],
   [/fire|flame|flammab|overheat|ignit/, 'Fire'],
   [/burn|scald/, 'Burn'],
   [/explo/, 'Explosion'],
@@ -156,4 +171,11 @@ export function hazardTag(title: string): string {
   }
   // "Serious injury" appears in most headlines, so it only counts when nothing more specific does
   return best || (/injur/.test(text) ? 'Injury' : 'Recall');
+}
+
+/** Which agency a recall came from. FDA recalls carry an "fda-" id. */
+export function recallSource(r: Pick<Recall, 'id'>): { short: 'FDA' | 'CPSC'; name: string } {
+  return String(r.id).startsWith('fda-')
+    ? { short: 'FDA', name: 'U.S. Food and Drug Administration' }
+    : { short: 'CPSC', name: 'U.S. Consumer Product Safety Commission' };
 }

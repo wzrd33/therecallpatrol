@@ -1,4 +1,5 @@
 import type { Recall, Severity, Category } from '@/types/recalls';
+import { fetchFdaFoodRecalls } from '@/lib/fda';
 
 // In-memory cache: Next.js data cache can't handle the 37MB CPSC response
 let _cache: { data: Recall[]; ts: number } | null = null;
@@ -38,8 +39,8 @@ function category(_type: string, title: string, product: string): Category {
   const forPets = /\bpets?\b/.test(t) && !/play ?sets?|child/.test(t);
   if (forPets || (PETS.test(t) && !forKids)) return 'pets';
   if (forKids) return 'kids';
-  if (COLD.test(t)) return 'refrigerator';
-  if (KITCHEN.test(t)) return 'pantry';
+  // Pantry and Fridge hold FDA food recalls, so kitchen gear and appliances live in Household
+  if (COLD.test(t) || KITCHEN.test(t)) return 'household';
   if (OUTDOORS.test(t) && !HOME_FIRST.test(t)) return 'other';
   // Everything left is something that lives around the house: furniture, heaters,
   // power banks, lighting, tools, cleaners, personal care.
@@ -65,7 +66,14 @@ function formatDate(s: string): string {
   } catch { return s; }
 }
 
+/** Everything the site shows: CPSC consumer products plus FDA food recalls, newest first. */
 export async function fetchRecalls(): Promise<Recall[]> {
+  // Both run together. The FDA call never throws; it returns an empty list on failure.
+  const [products, food] = await Promise.all([fetchCpscRecalls(), fetchFdaFoodRecalls()]);
+  return [...products, ...food].sort((a, b) => b.date.localeCompare(a.date));
+}
+
+async function fetchCpscRecalls(): Promise<Recall[]> {
   if (_cache && Date.now() - _cache.ts < TTL) return _cache.data;
 
   try {

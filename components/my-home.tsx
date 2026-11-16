@@ -6,7 +6,7 @@ import type { HomeItem } from '@/hooks/use-home-items';
 import type { OwnedMatch } from '@/utils/recall-match';
 import { recallName } from '@/utils/recall-name';
 
-const EXAMPLES = ['Baby stroller', 'Space heater', 'Air fryer', 'Power bank'];
+const EXAMPLES = ['Space heater', 'Air fryer', 'Power bank', 'Peanut butter'];
 
 export function MyHome({ items, matches, loading, coverage, onAdd, onRemove, onOpen }: {
   items: HomeItem[];
@@ -98,8 +98,8 @@ export function MyHome({ items, matches, loading, coverage, onAdd, onRemove, onO
                             <span className="block text-white text-[13px] font-semibold leading-snug line-clamp-2">{[recallName(r).brand, recallName(r).product].filter(Boolean).join(' ')}</span>
                             <span className={`block text-xs mt-0.5 ${kind === 'model' ? 'text-magenta font-bold' : 'text-white/55'}`}>
                               {kind === 'model'
-                                ? `Model ${model} is named in this recall. Confirm the serial or date range.`
-                                : 'Same name. Compare the model number on the notice.'}
+                                ? `${model} appears in this recall. Confirm the lot, serial or date range.`
+                                : 'Same name. Compare the model or lot code on the notice.'}
                             </span>
                             <span className="block text-white/45 text-xs mt-0.5">{r.dateFormatted}</span>
                           </span>
@@ -117,7 +117,7 @@ export function MyHome({ items, matches, loading, coverage, onAdd, onRemove, onO
       )}
 
       <p className="text-white/45 text-xs mt-3">
-        {coverage ? `Checked against ${coverage}. ` : ''}Older recalls and food, drug and vehicle recalls are not covered, so no match is not a guarantee that a product is safe. Your list is saved on this device only.
+        {coverage ? `Checked against ${coverage}. ` : ''}Older recalls, meat and poultry, medicine and vehicles are not covered, so no match is not a guarantee that a product is safe. Your list is saved on this device only.
       </p>
     </section>
   );
