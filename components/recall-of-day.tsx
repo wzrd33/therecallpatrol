@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import type { Recall } from '@/types/recalls';
 import { recallEmoji } from '@/components/recall-sheet';
+import { recallName } from '@/utils/recall-name';
 
 /** Same pick for everyone all day: rotates through recent high-risk recalls by calendar day. */
 export function pickRecallOfDay(recalls: Recall[]): Recall | null {
@@ -37,7 +38,7 @@ export function RecallOfDay({ recall, onOpen }: { recall: Recall | null; onOpen:
       </p>
       <div className="flex items-start gap-3 mb-3">
         <span className="text-4xl leading-none" aria-hidden="true">{recallEmoji(recall)}</span>
-        <h2 id="rotd-title" className="panel-title !mb-0 line-clamp-3">{recall.products || recall.title}</h2>
+        <h2 id="rotd-title" className="panel-title !mb-0 line-clamp-3">{[recallName(recall).brand, recallName(recall).product].filter(Boolean).join(' ')}</h2>
       </div>
       <p className="text-white/75 text-sm leading-relaxed line-clamp-4 mb-3">{recall.hazard}</p>
       <p className="text-sm text-white mb-4">

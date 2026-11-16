@@ -14,14 +14,33 @@ function severity(hazard: string, desc: string): Severity {
   return 'low';
 }
 
-function category(type: string, title: string, desc: string): Category {
-  const t = `${type} ${title} ${desc}`.toLowerCase();
-  if (/child|infant|toddler|baby|nursery|juvenile|youth|toy|game|stroller|car seat|crib|bassinet|playpen|diaper/.test(t)) return 'kids';
-  if (/\bpet\b|dog food|cat food|bird food|fish food|veterinary|kennel|aquarium|flea/.test(t)) return 'pets';
-  if (/refrigerat|freezer|frozen food|deli meat|raw meat|raw poultry|raw fish|fresh produce|dairy|cheese|yogurt/.test(t)) return 'refrigerator';
-  if (/\bfood\b|cereal|snack|candy|flour|sauce|pasta|rice|bread|beverage|drink|supplement|granola|cookie|cracker|peanut butter|salsa/.test(t)) return 'pantry';
-  if (/furniture|appliance|fan|heater|lamp|lighting|tool|hardware|ladder|cleaning|garden|outdoor|home furnish|power/.test(t)) return 'household';
-  return 'other';
+// Category rules read the product part of the headline plus the product name only.
+// The hazard text is left out on purpose: phrases like "child poisoning", "fire" or
+// "pet" in a hazard or description used to drag unrelated products into the wrong aisle.
+const PETS = /\b(pets?|puppy|puppies|kittens?|canine|feline|equine|horses?|saddles?|dog (food|treats?|toys?|beds?|crates?|collars?|leash(es)?|harness(es)?|chews?)|cat (food|treats?|toys?|trees?|litter)|leash(es)?|aquariums?|litter box(es)?|bird cages?|hamsters?|reptiles?|terrariums?)\b/;
+const KIDS = /\b(child(ren)?(['’]s)?|kids?(['’]s?)?|infants?|toddlers?|bab(y|ies)|newborns?|nursery|nursing pillows?|juvenile|youth|boys(['’])?|girls(['’])?|toys?|dolls?|plush|stuffed animals?|bears|play ?sets?|play ?yards?|playpens?|play mats?|play purse|playground|strollers?|car seats?|cribs?|bassinets?|bedside sleepers?|sleepsuits?|sleep sacks?|swaddles?|high ?chairs?|booster seats?|diapers?|teethers?|teething|rattles?|pacifiers?|soothers?|sippy|bibs?|sling carriers?|bath seats?|bouncers?|safety gates?|tip restraint kits?|water beads?|water balloons?|squish(y|ies)|surprise eggs?|building (blocks|cubes|sets?|sticks)|magnetic (balls?|blocks?|cubes?|tiles?|stick figure|building|chess|speed cubes?|fidget)|magnet (balls?|sets?|chess)|speed cubes?|fidget|montessori|busy boards?|pounding games?|board games?|chess games?|slot cars?|jewelry kits?|costumes?|trampolines?|swing sets?|ride-ons?|balance bikes?|tricycles?|pajamas?|sleepwear|loungewear|nightgowns?|onesies?|bunk beds?|slime|crayons?|coloring|highlighters|dive sticks?|prank)\b/;
+// Sports, vehicles and outdoor gear have no aisle of their own yet
+const OUTDOORS = /\b(bicycles?|bikes?|e-bikes?|e-trikes?|trikes?|scooters?|kickscooters?|motorcycles?|snowmobiles?|atvs?|rovs?|utvs?|all-terrain|off-road|off-highway|utility vehicles?|golf cars?|golf carts?|vehicles?|tractors?|helmets?|visors?|climbing|carabiners?|harness(es)?|ice axes?|belays?|via ferrata|avalanche|ski|skis|snowboards?|scuba|diving|regulators?|kayaks?|paddles?|ziplines?|fireworks?|rockets?|rifles?|pistols?|firearms?|ammo|treadmills?|rowing machines?|training cycles?|fitness machines?|resistance bands?|dumbbells?|exercise|sweaters?|sweatshirts?|hoodies?|jackets?|boots|socks|sandals)\b/;
+const COLD = /\b(refrigerators?|fridges?|mini ?fridges?|freezers?|ice makers?|ice machines?|ice crushers?|coolers?|wine chillers?|beverage centers?)\b/;
+const KITCHEN = /\b(air fryers?|fryers?|pressure cookers?|multi-?cookers?|slow cookers?|rice cookers?|cookers?|blenders?|juicers?|mixers?|food processors?|toasters?|microwaves?|ovens?|ranges|cooktops?|kettles?|coffee ?makers?|coffee|espresso|french press|carafes?|tumblers?|mugs?|cups?|drinkware|(water|carbonation|blender|sparkling water|candy) bottles?|food jars?|thermos|lunch box(es)?|cookware|(saut[ée]|frying|fry|sauce|sheet|baking|roasting) pans?|skillets?|dutch ovens?|bakeware|kitchen (knives|knife|scales?)|garlic press(es)?|cutting boards?|plates|bowls?|utensils?|dishwashers?|grill brush(es)?|cotton candy|candy|popcorn|waffle|griddles?|sous vide|can openers?|supplements?|multivitamins?|prosecco|wine|vinegar|straws?|glassware|dinnerware|flatware)\b/;
+// Household items whose names would otherwise trip the outdoors rules
+const HOME_FIRST = /\b(power banks?|safes?|fuel (containers?|cans?|bottles?)|power stations?|generators?)\b/;
+
+function category(_type: string, title: string, product: string): Category {
+  // "Acme Recalls Widgets Due to Fire Hazard" -> "Acme Recalls Widgets"
+  const subject = title.split(/\s+(?:Recalled\b|Expanded\s+Due\b|Due\s*\??\s*to\b)/i)[0];
+  const t = `${subject} ${product}`.toLowerCase();
+
+  const forKids = KIDS.test(t) && !/\badults?\b/.test(t);
+  const forPets = /\bpets?\b/.test(t) && !/play ?sets?|child/.test(t);
+  if (forPets || (PETS.test(t) && !forKids)) return 'pets';
+  if (forKids) return 'kids';
+  if (COLD.test(t)) return 'refrigerator';
+  if (KITCHEN.test(t)) return 'pantry';
+  if (OUTDOORS.test(t) && !HOME_FIRST.test(t)) return 'other';
+  // Everything left is something that lives around the house: furniture, heaters,
+  // power banks, lighting, tools, cleaners, personal care.
+  return 'household';
 }
 
 function formatDate(s: string): string {
@@ -101,7 +120,7 @@ async function fetchFromCpsc(dateParam: string, timeoutMs: number): Promise<Reca
       date:          item.RecallDate ?? '',
       dateFormatted: formatDate(item.RecallDate ?? ''),
       severity:      severity(hazard, description),
-      category:      category(productType, title, description),
+      category:      category(productType, title, productName),
       url:           item.URL ?? 'https://www.cpsc.gov/Recalls',
       description,
       products:      productName,

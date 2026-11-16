@@ -6,13 +6,14 @@ import Link from 'next/link';
 import type { Recall, Category } from '@/types/recalls';
 import { useLists } from '@/lib/lists';
 import { RecallSheet } from '@/components/recall-sheet';
+import { recallName } from '@/utils/recall-name';
 
 const META: Record<string, { label: string; desc: string; color: string; emoji: string }> = {
   kids:         { label: 'Kids & Baby',   desc: 'Toys, clothing, car seats, cribs, strollers, and more.',   color: '#B026FF', emoji: '🧸' },
-  pantry:       { label: 'Pantry',        desc: 'Canned goods, dry foods, snacks, condiments, and more.',   color: '#19E57A', emoji: '🥫' },
-  refrigerator: { label: 'Refrigerator',  desc: 'Meats, dairy, produce, and refrigerator appliances.',      color: '#00C9D7', emoji: '🧊' },
+  pantry:       { label: 'Pantry',        desc: 'Cookware, kitchen appliances, drinkware, and supplements.',   color: '#19E57A', emoji: '🥫' },
+  refrigerator: { label: 'Refrigerator',  desc: 'Refrigerators, mini fridges, freezers, and coolers.',      color: '#00C9D7', emoji: '🧊' },
   household:    { label: 'Household',     desc: 'Furniture, appliances, electronics, tools, and more.',     color: '#FF9A1A', emoji: '🏠' },
-  pets:         { label: 'Pets',          desc: 'Pet food, toys, accessories, and veterinary products.',    color: '#FF2B85', emoji: '🐾' },
+  pets:         { label: 'Pets',          desc: 'Pet toys, gear, and accessories.',    color: '#FF2B85', emoji: '🐾' },
 };
 
 const sevLabel: Record<string, string> = { high: 'High risk', medium: 'Medium risk', low: 'Low risk' };
@@ -98,7 +99,7 @@ export default function CategoryPage({ params }: { params: Promise<{ slug: strin
           )}
 
           <div className="space-y-3">
-            {recalls.map(r => (
+            {recalls.map(r => { const name = recallName(r); return (
               <div
                 key={r.id}
                 className="recall-card pl-5 pr-4 py-4 flex flex-col sm:flex-row gap-3 sm:items-start"
@@ -117,7 +118,8 @@ export default function CategoryPage({ params }: { params: Promise<{ slug: strin
                       <span className="sev-pill" data-on-dark="" data-sev={r.severity}>{sevLabel[r.severity] ?? r.severity}</span>
                       <span className="text-white/60 text-xs">{r.dateFormatted}</span>
                     </span>
-                    <span className="block font-bold text-[15px] leading-snug mb-1.5 line-clamp-3" style={{ fontFamily: "'Space Grotesk',sans-serif" }}>{r.title}</span>
+                    {name.brand && <span className="block text-cyan-light text-[11px] font-bold uppercase tracking-wider mb-0.5">{name.brand}</span>}
+                    <span className="block font-extrabold text-lg leading-tight tracking-tight mb-1.5 line-clamp-2" style={{ fontFamily: "'Space Grotesk',sans-serif" }}>{name.product}</span>
                     <span className="block text-white/70 text-[13px] leading-relaxed line-clamp-3">{r.hazard}</span>
                     <span className="block mt-2 text-yellow text-xs font-bold">More info <span aria-hidden="true">›</span></span>
                   </span>
@@ -142,7 +144,7 @@ export default function CategoryPage({ params }: { params: Promise<{ slug: strin
                   </a>
                 </div>
               </div>
-            ))}
+            ); })}
           </div>
         </section>
 

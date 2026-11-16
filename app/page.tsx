@@ -12,6 +12,7 @@ import { RecallOfDay, pickRecallOfDay } from '@/components/recall-of-day';
 import { usePatrol } from '@/hooks/use-patrol';
 import { useHomeItems } from '@/hooks/use-home-items';
 import { findOwnedMatches } from '@/utils/recall-match';
+import { recallName, dailyLineup } from '@/utils/recall-name';
 
 const CATEGORIES = [
   { slug: 'kids',         label: 'Kids',      emoji: '🧸', color: '#B026FF' },
@@ -39,9 +40,10 @@ export default function HomePage() {
       .catch(() => { setError(true); setLoading(false); });
   }, []);
 
-  // Carousel shows only the newest recalls; category counts below still use the full list
+  // Carousel: newest recalls first, then a fresh draw from recent months each day.
+  // Category counts below still use the full list.
   const latest = useMemo(
-    () => [...recalls].sort((a, b) => b.date.localeCompare(a.date)).slice(0, CAROUSEL_LIMIT),
+    () => dailyLineup(recalls, CAROUSEL_LIMIT).map(r => ({ r, name: recallName(r) })),
     [recalls],
   );
 
@@ -126,6 +128,7 @@ export default function HomePage() {
             <div className="flex items-center gap-2">
               <h2 className="text-white font-bold text-lg" style={{ fontFamily: "'Space Grotesk',sans-serif" }}>📼 Now Recalled</h2>
               <span className="px-2 py-0.5 bg-magenta text-white text-xs font-bold rounded uppercase tracking-wide animate-pulse">Live</span>
+              <span className="text-white/50 text-xs max-sm:hidden">New shelf every day</span>
               {patrol.newIds.size > 0 && (
                 <span className="px-2 py-0.5 bg-yellow text-navy text-xs font-bold rounded uppercase tracking-wide">{patrol.newIds.size} new</span>
               )}
@@ -153,7 +156,7 @@ export default function HomePage() {
               ref={trackRef}
               className="vhs-track flex gap-3 overflow-x-auto px-4 pt-3 pb-5 scroll-px-4"
             >
-              {latest.map(r => (
+              {latest.map(({ r, name }) => (
                 <div
                   key={r.id}
                   data-sev={r.severity}
@@ -174,8 +177,9 @@ export default function HomePage() {
                       </span>
                     </span>
                     <span className="flex-1 w-full px-2.5 flex flex-col gap-1">
-                      <span className="text-cyan-light text-[11px] font-bold uppercase tracking-wider">{r.category}</span>
-                      <span className="text-white text-[13px] font-bold leading-snug line-clamp-3" style={{ fontFamily: "'Space Grotesk',sans-serif" }}>{r.title}</span>
+                      <span className="text-cyan-light text-[11px] font-bold uppercase tracking-wider truncate">{name.brand || r.category}</span>
+                      <span className="text-white text-base font-extrabold leading-tight tracking-tight line-clamp-3" style={{ fontFamily: "'Space Grotesk',sans-serif" }}>{name.product}</span>
+                      {name.hazard && <span className="vhs-hazard line-clamp-2">{name.hazard}</span>}
                       <span className="text-white/60 text-xs">{r.dateFormatted}</span>
                       <span className="mt-auto pt-1 text-yellow text-xs font-bold">More info <span aria-hidden="true">›</span></span>
                     </span>

@@ -339,6 +339,13 @@
 
   .sev-pill[data-on-dark][data-sev='low'] { color: #5fdfea; }
 
+  /* The danger in a couple of words, in the card's severity colour */
+  .vhs-hazard {
+    color: color-mix(in srgb, var(--sev) 70%, #fff);
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1.25;
+  }
   .vhs-open { touch-action: manipulation; -webkit-tap-highlight-color: transparent; cursor: pointer; }
   .vhs-open:focus-visible { outline: 2px solid #ffdc28; outline-offset: -3px; border-radius: 0.75rem; }
 
