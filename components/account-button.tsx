@@ -31,7 +31,7 @@ export function AccountButton() {
         className="ml-1 px-3 py-3 max-w-[9.5rem] rounded-full flex-shrink-0 flex items-center gap-1.5 text-sm font-bold text-white border border-white/25 hover:bg-white/10 transition-colors"
         style={{ fontFamily: "'Space Grotesk', sans-serif" }}
       >
-        <span aria-hidden="true">🐾</span>
+        <span aria-hidden="true">🐶</span>
         <span className="truncate">{nickname}</span>
       </Link>
     );

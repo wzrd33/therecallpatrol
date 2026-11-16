@@ -13,8 +13,8 @@ const META: Record<string, { label: string; desc: string; color: string; emoji: 
   pantry:       { label: 'Pantry',        desc: 'Cookware, kitchen appliances, drinkware, and supplements.',   color: '#19E57A', emoji: '🥫' },
   refrigerator: { label: 'Refrigerator',  desc: 'Refrigerators, mini fridges, freezers, and coolers.',      color: '#00C9D7', emoji: '🧊' },
   household:    { label: 'Household',     desc: 'Furniture, appliances, electronics, tools, and more.',     color: '#FF9A1A', emoji: '🏠' },
-  outdoors:     { label: 'Outdoors & Sports', desc: 'Bikes, e-bikes, off-road vehicles, helmets, and sports gear.', color: '#FFDC28', emoji: '🚲' },
-  pets:         { label: 'Pets',          desc: 'Pet toys, gear, and accessories.',    color: '#FF2B85', emoji: '🐾' },
+  outdoors:     { label: 'Outdoors & Sports', desc: 'Bikes, e-bikes, off-road vehicles, helmets, and sports gear.', color: '#FFDC28', emoji: '⛺' },
+  pets:         { label: 'Pets',          desc: 'Pet toys, gear, and accessories.',    color: '#FF2B85', emoji: '🐶' },
 };
 
 const sevLabel: Record<string, string> = { high: 'High risk', medium: 'Medium risk', low: 'Low risk' };
@@ -96,7 +96,7 @@ export default function CategoryPage({ params }: { params: Promise<{ slug: strin
 
           {!loading && !failed && recalls.length === 0 && (
             <div className="text-center py-12 text-white/60">
-              <div className="text-4xl mb-3">🐾</div>
+              <div className="text-4xl mb-3">🐶</div>
               <p>No recent recalls in this category. Scout is keeping watch.</p>
             </div>
           )}
@@ -158,7 +158,7 @@ export default function CategoryPage({ params }: { params: Promise<{ slug: strin
           </h2>
           {listItems.length === 0 ? (
             <div className="border-2 border-dashed border-white/20 rounded-xl p-8 text-center text-white/60">
-              <div className="text-3xl mb-2">🐾</div>
+              <div className="text-3xl mb-2">🐶</div>
               <p className="text-sm">Nothing added yet. Tap <strong>+ Add</strong> on any recall above.</p>
             </div>
           ) : (

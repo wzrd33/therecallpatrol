@@ -16,7 +16,7 @@ const PRODUCT_EMOJI: [RegExp, string][] = [
   [/chair|recliner|stool|sofa/, '🪑'],
   [/pajama|sleepwear|loungewear|nightgown|robe|jacket|hoodie|sweat|costume/, '👕'],
   [/helmet/, '⛑️'],
-  [/e-bike|bicycle|\bbikes?\b|trike/, '🚲'],
+  [/e-bike|bicycle|\bbikes?\b|trike/, '🚴'],
   [/scooter/, '🛴'],
   [/motorcycle|atv|off-road|off-highway|golf car|vehicle|snowmobile/, '🏍️'],
   [/stroller|car seat/, '🚼'],
@@ -55,7 +55,7 @@ export function recallEmoji(r: Recall): string {
     if (t.includes('fan') || t.includes('heater')) return '🌡️';
     return '🏠';
   }
-  if (r.category === 'pets') return '🐾';
+  if (r.category === 'pets') return '🐶';
   if (r.category === 'other') return '🏕️';
   if (t.includes('fire') || t.includes('burn')) return '🔥';
   if (t.includes('food')) return '🍽️';

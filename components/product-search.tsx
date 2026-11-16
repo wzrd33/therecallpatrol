@@ -116,7 +116,7 @@ export function ProductSearch() {
               )}
               {!failed && recalls && terms.length > 0 && matches.length === 0 && (
                 <p className="search-note">
-                  <span className="block text-3xl mb-2" aria-hidden="true">🐾</span>
+                  <span className="block text-3xl mb-2" aria-hidden="true">🐶</span>
                   No recalls found for “{query.trim()}”. Good news, but check the spelling or try the brand name.
                 </p>
               )}

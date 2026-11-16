@@ -14,7 +14,7 @@ export default function SignupPage() {
   if (submitted) {
     return (
       <div className="bg-navy text-white flex-1 flex flex-col items-center justify-center px-4 py-16 text-center">
-        <div className="text-6xl mb-4" aria-hidden="true">🐾</div>
+        <div className="text-6xl mb-4" aria-hidden="true">🐶</div>
         <h1 className="text-2xl font-extrabold mb-2" style={{ fontFamily: "'Space Grotesk',sans-serif" }}>You're on patrol, {nickname.trim()}!</h1>
         <p className="text-white/70 mb-2 max-w-sm">Your details are saved on this device. Next, tell Scout what's in your house so it can check it every time you visit.</p>
         <p className="text-white/50 text-sm mb-6 max-w-sm">Daily email alerts aren't switched on yet. You'll be able to turn them on here when they are.</p>

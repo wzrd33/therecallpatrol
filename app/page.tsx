@@ -19,9 +19,9 @@ const CATEGORIES = [
   { slug: 'pantry',       label: 'Pantry',    emoji: '🥫', color: '#19E57A' },
   { slug: 'refrigerator', label: 'Fridge',    emoji: '🧊', color: '#00C9D7' },
   { slug: 'household',    label: 'Household', emoji: '🏠', color: '#FF9A1A' },
-  { slug: 'pets',         label: 'Pets',      emoji: '🐾', color: '#FF2B85' },
+  { slug: 'pets',         label: 'Pets',      emoji: '🐶', color: '#FF2B85' },
   // The feed files sports, vehicles and outdoor gear under 'other'
-  { slug: 'outdoors',     label: 'Outdoors',  emoji: '🚲', color: '#FFDC28', dataCategory: 'other' },
+  { slug: 'outdoors',     label: 'Outdoors',  emoji: '⛺', color: '#FFDC28', dataCategory: 'other' },
 ];
 
 const CAROUSEL_LIMIT = 30;
