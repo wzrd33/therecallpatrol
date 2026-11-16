@@ -55,6 +55,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <Image src="/images/scout-logo.webp" alt="Scout" width={28} height={28} className="rounded-md opacity-70" />
               <span>Recall Patrol. Keeping households safe.</span>
             </div>
+            <nav aria-label="Site information" className="flex gap-1">
+              <Link href="/about" className="px-3 py-3 hover:text-white">About</Link>
+              <Link href="/privacy" className="px-3 py-3 hover:text-white">Privacy</Link>
+              <a href="mailto:team@therecallpatrol.com" className="px-3 py-3 hover:text-white">Contact</a>
+            </nav>
             <span className="text-center sm:text-right">
               Recall data from the U.S. Consumer Product Safety Commission, last two years.<br />
               © {new Date().getFullYear()} therecallpatrol.com

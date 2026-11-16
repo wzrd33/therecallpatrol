@@ -6,7 +6,7 @@ import Link from 'next/link';
 import type { Recall, Category } from '@/types/recalls';
 import { useLists } from '@/lib/lists';
 import { RecallSheet } from '@/components/recall-sheet';
-import { recallName } from '@/utils/recall-name';
+import { recallName, hazardTag } from '@/utils/recall-name';
 
 const META: Record<string, { label: string; desc: string; color: string; emoji: string }> = {
   kids:         { label: 'Kids & Baby',   desc: 'Toys, clothing, car seats, cribs, strollers, and more.',   color: '#B026FF', emoji: '🧸' },
@@ -17,7 +17,6 @@ const META: Record<string, { label: string; desc: string; color: string; emoji: 
   pets:         { label: 'Pets',          desc: 'Pet toys, gear, and accessories.',    color: '#FF2B85', emoji: '🐶' },
 };
 
-const sevLabel: Record<string, string> = { high: 'High risk', medium: 'Medium risk', low: 'Low risk' };
 
 export default function CategoryPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = React.use(params);
@@ -118,7 +117,7 @@ export default function CategoryPage({ params }: { params: Promise<{ slug: strin
                   </span>
                   <span className="block flex-1 min-w-0">
                     <span className="flex items-center gap-2 flex-wrap mb-2">
-                      <span className="sev-pill" data-on-dark="" data-sev={r.severity}>{sevLabel[r.severity] ?? r.severity}</span>
+                      <span className="sev-pill" data-on-dark="" data-sev={r.severity}>{name.hazard || hazardTag(r.title)}</span>
                       <span className="text-white/60 text-xs">{r.dateFormatted}</span>
                     </span>
                     {name.brand && <span className="block text-cyan-light text-[11px] font-bold uppercase tracking-wider mb-0.5">{name.brand}</span>}
@@ -166,7 +165,7 @@ export default function CategoryPage({ params }: { params: Promise<{ slug: strin
               {listItems.map(item => (
                 <div key={item.id} className="recall-card pl-5 pr-2 py-1.5 flex items-center gap-3">
                   <div className="flex-1 font-semibold text-sm truncate">{item.title}</div>
-                  <span className="sev-pill flex-shrink-0" data-on-dark="" data-sev={item.severity}>{item.severity}</span>
+                  <span className="sev-pill flex-shrink-0" data-on-dark="" data-sev={item.severity}>{hazardTag(item.title)}</span>
                   <button
                     type="button"
                     aria-label={`Remove ${item.title} from watchlist`}

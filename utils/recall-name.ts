@@ -118,3 +118,42 @@ export function dailyLineup(recalls: Recall[], limit: number, fresh = 8, day = n
   }
   return [...lead, ...pool.slice(0, Math.max(0, limit - lead.length))];
 }
+
+const HAZARD_TAGS: [RegExp, string][] = [
+  [/fire|flame|flammab|overheat|ignit/, 'Fire'],
+  [/burn|scald/, 'Burn'],
+  [/explo/, 'Explosion'],
+  [/electrocution|shock/, 'Shock'],
+  [/carbon monoxide/, 'CO gas'],
+  [/suffocat|asphyx/, 'Suffocation'],
+  [/strangul/, 'Strangulation'],
+  [/drown/, 'Drowning'],
+  [/chok/, 'Choking'],
+  [/ingest|swallow/, 'Ingestion'],
+  [/tip-?over/, 'Tip-over'],
+  [/entrap/, 'Entrapment'],
+  [/poison/, 'Poisoning'],
+  [/\blead\b|phthalate|chemical/, 'Chemical'],
+  [/bacteria|mold|contamina/, 'Bacteria'],
+  [/crash|collision/, 'Crash'],
+  [/fall/, 'Fall'],
+  [/lacerat|\bcut\b|amputat/, 'Laceration'],
+  [/impact|projectile/, 'Impact'],
+];
+
+/**
+ * One-word hazard for a badge: "Fire", "Choking", "Tip-over". Taken from the part of
+ * the CPSC headline after "Due to", using whichever hazard the headline names first.
+ */
+export function hazardTag(title: string): string {
+  const parts = title.split(/\s+Due\s*\??\s*(?:to\s+)?/i);
+  const text = (parts.length > 1 ? parts.slice(1).join(' ') : title).toLowerCase();
+  let best = '';
+  let at = Infinity;
+  for (const [re, label] of HAZARD_TAGS) {
+    const i = text.search(re);
+    if (i >= 0 && i < at) { at = i; best = label; }
+  }
+  // "Serious injury" appears in most headlines, so it only counts when nothing more specific does
+  return best || (/injur/.test(text) ? 'Injury' : 'Recall');
+}

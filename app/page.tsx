@@ -12,7 +12,7 @@ import { RecallOfDay, pickRecallOfDay } from '@/components/recall-of-day';
 import { usePatrol } from '@/hooks/use-patrol';
 import { useHomeItems } from '@/hooks/use-home-items';
 import { findOwnedMatchesDetailed, type OwnedMatch } from '@/utils/recall-match';
-import { recallName, dailyLineup } from '@/utils/recall-name';
+import { recallName, dailyLineup, hazardTag } from '@/utils/recall-name';
 
 const CATEGORIES = [
   { slug: 'kids',         label: 'Kids',      emoji: '🧸', color: '#B026FF' },
@@ -25,7 +25,6 @@ const CATEGORIES = [
 ];
 
 const CAROUSEL_LIMIT = 30;
-const sevLabel = { high: '⚠ High', medium: 'Medium', low: 'Low' };
 
 export default function HomePage() {
   const [recalls, setRecalls] = useState<Recall[]>([]);
@@ -184,7 +183,7 @@ export default function HomePage() {
                       {recallEmoji(r)}
                       {patrol.newIds.has(r.id) && <span className="new-flag absolute top-3 left-2">New</span>}
                       <span className="sev-badge absolute top-3 right-2" data-sev={r.severity}>
-                        {sevLabel[r.severity]}
+                        ⚠ {hazardTag(r.title)}
                       </span>
                     </span>
                     <span className="flex-1 w-full px-2.5 flex flex-col gap-1">

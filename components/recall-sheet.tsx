@@ -2,9 +2,8 @@
 
 import { useEffect, useRef } from 'react';
 import type { Recall } from '@/types/recalls';
-import { recallName } from '@/utils/recall-name';
+import { recallName, hazardTag } from '@/utils/recall-name';
 
-const sevRisk = { high: 'High risk', medium: 'Medium risk', low: 'Low risk' };
 
 const PRODUCT_EMOJI: [RegExp, string][] = [
   [/toy|doll|plush|playset|game/, '🧸'],
@@ -99,7 +98,7 @@ export function RecallSheet({ recall, isAdded, onToggle, onClose }: {
         </div>
         <div className="sheet-body">
           <div className="flex items-center gap-2 flex-wrap mb-3">
-            <span className="sev-pill" data-sev={recall.severity} data-on-dark="">{sevRisk[recall.severity]}</span>
+            <span className="sev-pill" data-sev={recall.severity} data-on-dark="">{name.hazard || hazardTag(recall.title)}</span>
             <span className="text-cyan-light text-xs font-bold uppercase tracking-wider">{recall.category === 'other' ? 'outdoors' : recall.category}</span>
             <span className="text-white/60 text-xs">· {recall.dateFormatted}</span>
           </div>

@@ -2,12 +2,12 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Search, X } from 'lucide-react';
+import { hazardTag } from '@/utils/recall-name';
 import type { Recall } from '@/types/recalls';
 import { useLists } from '@/lib/lists';
 import { RecallSheet, recallEmoji } from '@/components/recall-sheet';
 
 const MAX_RESULTS = 25;
-const sevRisk = { high: 'High risk', medium: 'Medium risk', low: 'Low risk' };
 
 export function ProductSearch() {
   const [open, setOpen] = useState(false);
@@ -134,7 +134,7 @@ export function ProductSearch() {
                           <span className="block flex-1 min-w-0">
                             <span className="block text-white text-sm font-bold leading-snug line-clamp-2" style={{ fontFamily: "'Space Grotesk',sans-serif" }}>{r.products || r.title}</span>
                             <span className="flex items-center gap-2 flex-wrap mt-1.5">
-                              <span className="sev-badge" data-sev={r.severity}>{sevRisk[r.severity]}</span>
+                              <span className="sev-badge" data-sev={r.severity}>{hazardTag(r.title)}</span>
                               <span className="text-white/60 text-xs">{r.dateFormatted}</span>
                             </span>
                           </span>
