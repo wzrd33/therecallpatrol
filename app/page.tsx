@@ -20,6 +20,8 @@ const CATEGORIES = [
   { slug: 'refrigerator', label: 'Fridge',    emoji: '🧊', color: '#00C9D7' },
   { slug: 'household',    label: 'Household', emoji: '🏠', color: '#FF9A1A' },
   { slug: 'pets',         label: 'Pets',      emoji: '🐾', color: '#FF2B85' },
+  // The feed files sports, vehicles and outdoor gear under 'other'
+  { slug: 'outdoors',     label: 'Outdoors',  emoji: '🚲', color: '#FFDC28', dataCategory: 'other' },
 ];
 
 const CAROUSEL_LIMIT = 30;
@@ -97,7 +99,9 @@ export default function HomePage() {
             Real-time alerts on recalled products: food, toys, appliances, and more.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center max-w-xs sm:max-w-none mx-auto">
-            <Link href="/signup" className="btn-primary">Start Patrolling Free <span aria-hidden="true">→</span></Link>
+            {patrol.nickname
+              ? <Link href="/#my-home" className="btn-primary">Check My Home <span aria-hidden="true">→</span></Link>
+              : <Link href="/signup" className="btn-primary">Start Patrolling Free <span aria-hidden="true">→</span></Link>}
             <Link href="/categories" className="btn-secondary">Browse by Category</Link>
           </div>
         </div>
@@ -177,7 +181,7 @@ export default function HomePage() {
                       </span>
                     </span>
                     <span className="flex-1 w-full px-2.5 flex flex-col gap-1">
-                      <span className="text-cyan-light text-[11px] font-bold uppercase tracking-wider truncate">{name.brand || r.category}</span>
+                      <span className="text-cyan-light text-[11px] font-bold uppercase tracking-wider truncate">{name.brand || (r.category === 'other' ? 'outdoors' : r.category)}</span>
                       <span className="text-white text-base font-extrabold leading-tight tracking-tight line-clamp-3" style={{ fontFamily: "'Space Grotesk',sans-serif" }}>{name.product}</span>
                       {name.hazard && <span className="vhs-hazard line-clamp-2">{name.hazard}</span>}
                       <span className="text-white/60 text-xs">{r.dateFormatted}</span>
@@ -229,14 +233,14 @@ export default function HomePage() {
         <h2 className="text-white text-2xl font-extrabold mb-5" style={{ fontFamily: "'Space Grotesk',sans-serif" }}>
           Scout's <span className="text-magenta">On Watch</span>
         </h2>
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
-          {CATEGORIES.map((c, i) => {
-            const count = recalls.filter(r => r.category === c.slug).length;
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+          {CATEGORIES.map(c => {
+            const count = recalls.filter(r => r.category === (c.dataCategory ?? c.slug)).length;
             return (
               <Link
                 key={c.slug}
                 href={`/categories/${c.slug}`}
-                className={`cat-tile sm:min-h-[150px] ${i === CATEGORIES.length - 1 ? 'max-sm:col-span-2' : ''}`}
+                className="cat-tile sm:min-h-[150px]"
                 style={{ '--cat': c.color } as React.CSSProperties}
               >
                 <span className="cat-chip" aria-hidden="true">{c.emoji}</span>

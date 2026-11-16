@@ -5,7 +5,8 @@ const CATEGORIES = [
   { slug: 'pantry',       label: 'Pantry',       emoji: '🥫', desc: 'Cookware, kitchen appliances, drinkware, and supplements.', color: '#19E57A' },
   { slug: 'refrigerator', label: 'Refrigerator', emoji: '🧊', desc: 'Refrigerators, mini fridges, freezers, and coolers.',    color: '#00C9D7' },
   { slug: 'household',    label: 'Household',    emoji: '🏠', desc: 'Furniture, appliances, electronics, tools, and more.',   color: '#FF9A1A' },
-  { slug: 'pets',         label: 'Pets',         emoji: '🐾', desc: 'Pet toys, gear, and accessories.',  color: '#FF2B85' },
+  { slug: 'outdoors',     label: 'Outdoors & Sports', emoji: '🚲', desc: 'Bikes, e-bikes, off-road vehicles, helmets, and sports gear.', color: '#FFDC28' },
+  { slug: 'pets',        label: 'Pets',         emoji: '🐾', desc: 'Pet toys, gear, and accessories.',  color: '#FF2B85' },
 ];
 
 export default function CategoriesPage() {

@@ -13,6 +13,7 @@ const META: Record<string, { label: string; desc: string; color: string; emoji: 
   pantry:       { label: 'Pantry',        desc: 'Cookware, kitchen appliances, drinkware, and supplements.',   color: '#19E57A', emoji: '🥫' },
   refrigerator: { label: 'Refrigerator',  desc: 'Refrigerators, mini fridges, freezers, and coolers.',      color: '#00C9D7', emoji: '🧊' },
   household:    { label: 'Household',     desc: 'Furniture, appliances, electronics, tools, and more.',     color: '#FF9A1A', emoji: '🏠' },
+  outdoors:     { label: 'Outdoors & Sports', desc: 'Bikes, e-bikes, off-road vehicles, helmets, and sports gear.', color: '#FFDC28', emoji: '🚲' },
   pets:         { label: 'Pets',          desc: 'Pet toys, gear, and accessories.',    color: '#FF2B85', emoji: '🐾' },
 };
 
@@ -21,6 +22,8 @@ const sevLabel: Record<string, string> = { high: 'High risk', medium: 'Medium ri
 export default function CategoryPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = React.use(params);
   const meta = META[slug] ?? META.household;
+  // The feed files sports, vehicles and outdoor gear under 'other'
+  const dataCategory = slug === 'outdoors' ? 'other' : slug;
 
   const [recalls, setRecalls] = useState<Recall[]>([]);
   const [loading, setLoading] = useState(true);
@@ -34,15 +37,15 @@ export default function CategoryPage({ params }: { params: Promise<{ slug: strin
       .then(r => { if (!r.ok) throw new Error('recalls unavailable'); return r.json(); })
       .then(d => {
         const all: Recall[] = d.recalls ?? [];
-        setRecalls(all.filter(r => r.category === slug));
+        setRecalls(all.filter(r => r.category === dataCategory));
         setLoading(false);
       })
       .catch(() => { setFailed(true); setLoading(false); });
-  }, [slug]);
+  }, [dataCategory]);
 
   useEffect(() => {
-    setListItems(getByCategory(slug));
-  }, [added, slug, getByCategory]);
+    setListItems(getByCategory(dataCategory));
+  }, [added, dataCategory, getByCategory]);
 
   return (
     <div className="bg-navy text-white flex-1" style={{ '--cat': meta.color } as React.CSSProperties}>

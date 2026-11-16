@@ -9,6 +9,8 @@ const SESSION_BASE_KEY = 'rp_session_base';   // snapshot of SEEN_KEY taken when
 const SESSION_LAST_KEY = 'rp_session_last';   // snapshot of LAST_VISIT_KEY taken when this tab session began
 const STREAK_KEY = 'rp_streak';
 const PROFILE_KEY = 'rp_profile';
+/** Fired in this tab when the profile is saved, so the header can update at once */
+export const PROFILE_EVENT = 'rp-profile';
 
 const dayKey = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 
@@ -18,7 +20,10 @@ export function readProfile(): Profile | null {
   try { return JSON.parse(localStorage.getItem(PROFILE_KEY) ?? 'null'); } catch { return null; }
 }
 export function saveProfile(p: Profile) {
-  try { localStorage.setItem(PROFILE_KEY, JSON.stringify(p)); } catch {}
+  try {
+    localStorage.setItem(PROFILE_KEY, JSON.stringify(p));
+    window.dispatchEvent(new Event(PROFILE_EVENT));
+  } catch {}
 }
 
 /**

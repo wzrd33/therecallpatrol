@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ProductSearch } from '@/components/product-search';
+import { AccountButton } from '@/components/account-button';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -40,13 +41,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               </Link>
             </nav>
             <ProductSearch />
-            <Link
-              href="/signup"
-              className="ml-1 px-4 py-3 bg-yellow text-navy text-sm font-bold rounded-full flex-shrink-0 hover:opacity-90 transition-opacity"
-              style={{ fontFamily: "'Space Grotesk', sans-serif" }}
-            >
-              Sign Up
-            </Link>
+            <AccountButton />
           </div>
         </header>
 

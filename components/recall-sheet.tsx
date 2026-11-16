@@ -56,6 +56,7 @@ export function recallEmoji(r: Recall): string {
     return '🏠';
   }
   if (r.category === 'pets') return '🐾';
+  if (r.category === 'other') return '🏕️';
   if (t.includes('fire') || t.includes('burn')) return '🔥';
   if (t.includes('food')) return '🍽️';
   return '⚠️';
@@ -99,7 +100,7 @@ export function RecallSheet({ recall, isAdded, onToggle, onClose }: {
         <div className="sheet-body">
           <div className="flex items-center gap-2 flex-wrap mb-3">
             <span className="sev-pill" data-sev={recall.severity} data-on-dark="">{sevRisk[recall.severity]}</span>
-            <span className="text-cyan-light text-xs font-bold uppercase tracking-wider">{recall.category}</span>
+            <span className="text-cyan-light text-xs font-bold uppercase tracking-wider">{recall.category === 'other' ? 'outdoors' : recall.category}</span>
             <span className="text-white/60 text-xs">· {recall.dateFormatted}</span>
           </div>
           {name.brand && <p className="text-cyan-light text-xs font-bold uppercase tracking-wider mb-1">{name.brand}</p>}
