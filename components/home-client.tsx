@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import type { Recall } from '@/types/recalls';
-import { useLists } from '@/lib/lists';
+import { useLists, type ListItem } from '@/lib/lists';
 import { RecallSheet, recallEmoji } from '@/components/recall-sheet';
 import { SearchLauncher } from '@/components/product-search';
 import { PatrolReport } from '@/components/patrol-report';
@@ -48,10 +48,23 @@ export function HomeClient({ initial, counts }: { initial: Recall[]; counts: Rec
 
   // Carousel: newest recalls first, then a fresh draw from recent months each day.
   // Category counts below still use the full list.
-  const latest = useMemo(
-    () => dailyLineup(recalls, CAROUSEL_LIMIT).map(r => ({ r, name: recallName(r) })),
-    [recalls],
-  );
+  // Recalls already on the watchlist leave the shelf (they live in My Home), and the
+  // next picks move up so the shelf stays full.
+  const latest = useMemo(() => {
+    const watched = Object.keys(added).length;
+    return dailyLineup(recalls, CAROUSEL_LIMIT + watched)
+      .filter(r => !added[r.id])
+      .slice(0, CAROUSEL_LIMIT)
+      .map(r => ({ r, name: recallName(r) }));
+  }, [recalls, added]);
+
+  // A short confirmation with an undo, since the card disappears the moment it is watched
+  const [moved, setMoved] = useState<{ item: ListItem; name: string } | null>(null);
+  useEffect(() => {
+    if (!moved) return;
+    const t = setTimeout(() => setMoved(null), 6000);
+    return () => clearTimeout(t);
+  }, [moved]);
 
   const patrol = usePatrol(recalls);
   const { items: homeItems, addItem, removeItem } = useHomeItems();
@@ -213,7 +226,11 @@ export function HomeClient({ initial, counts }: { initial: Recall[]; counts: Rec
                       <button
                         type="button"
                         aria-pressed={!!added[r.id]}
-                        onClick={() => toggle({ id: r.id, title: r.title, category: r.category, severity: r.severity, date: r.dateFormatted, url: r.url })}
+                        onClick={() => {
+                          const item = { id: r.id, title: r.title, category: r.category, severity: r.severity, date: r.dateFormatted, url: r.url };
+                          toggle(item);
+                          setMoved({ item, name: [name.brand, name.product].filter(Boolean).join(' ') });
+                        }}
                         data-added={!!added[r.id]}
                         className="tap add-btn w-full rounded-lg text-sm"
                       >
@@ -276,6 +293,16 @@ export function HomeClient({ initial, counts }: { initial: Recall[]; counts: Rec
         </div>
       </div>
       </section>
+
+      {moved && (
+        <div role="status" className="fixed z-40 left-1/2 -translate-x-1/2 bottom-4 w-[calc(100%-2rem)] max-w-md rounded-2xl bg-white text-navy shadow-2xl px-4 py-3 flex items-center gap-3">
+          <span className="flex-1 min-w-0 text-sm leading-snug">
+            <span className="font-bold">Saved to My Home.</span> <span className="line-clamp-1">{moved.name}</span>
+          </span>
+          <button type="button" onClick={() => { toggle(moved.item); setMoved(null); }} className="tap px-3 rounded-full text-sm font-bold text-navy underline underline-offset-4 flex-shrink-0">Undo</button>
+          <Link href="/my-home" className="tap px-4 rounded-full text-sm font-bold bg-magenta text-white flex-shrink-0">View</Link>
+        </div>
+      )}
 
       {selected && (
         <RecallSheet
