@@ -52,8 +52,13 @@ const firstWord = (s: string) => s.split(/\s+/)[0]?.replace(/[^A-Za-z0-9]/g, '')
  *   "ACME Widgets Recalled Due to Fire Hazard"
  * This pulls out the parts a person scanning the page cares about.
  */
-export function recallName(r: Pick<Recall, 'title' | 'products'>): RecallName {
-  const title = r.title.replace(/\s+/g, ' ').trim();
+const SUFFIX = /,?\s+(?:Inc\.?|LLC|L\.L\.C\.|Corp\.?|Corporation|Company|Co\.|Ltd\.?|Limited|Group|Enterprises|International|Industries|Stores|USA|U\.S\.|America|North America|Americas)$/gi;
+const word = (s: string) => s.replace(/[^A-Za-z0-9]/g, '').toLowerCase();
+
+export function recallName(r: Pick<Recall, 'title' | 'products'> & { description?: string }): RecallName {
+  const title = r.title.replace(/\s+/g, ' ').trim()
+    // USDA alert headlines: "FSIS Issues Public Health Alert for X Due to Y"
+    .replace(/^FSIS\s+Issues\s+Public\s+Health\s+Alert\s+(?:for|on|regarding)\s+/i, '');
   const [subject, ...rest] = title.split(/\s+(?:Expanded\s+)?Due\s*\??\s*(?:to\s+)?/i);
   const hazard = tidyHazard(rest.join(' '));
 
@@ -70,8 +75,25 @@ export function recallName(r: Pick<Recall, 'title' | 'products'>): RecallName {
     brand = b?.[2]?.trim() ?? '';
   }
 
-  if (brand && product.toLowerCase().startsWith(brand.toLowerCase() + ' ') && product.length > brand.length + 4) {
-    product = product.slice(brand.length + 1);
+  // Company suffixes stay out of the eyebrow, and out of the comparison below
+  brand = brand.replace(SUFFIX, '').replace(SUFFIX, '').trim();
+
+  // "WinCo Foods, LLC" recalls "WinCo Foods Hoagie Rolls": drop every leading word the two share
+  if (brand) {
+    const bw = brand.split(/\s+/).map(word);
+    const pw = product.split(/\s+/);
+    let k = 0;
+    while (k < bw.length && k < pw.length - 1 && word(pw[k]) === bw[k]) k++;
+    if (k > 0) {
+      const rest = pw.slice(k).join(' ').replace(/^(?:(?:LLC|Inc\.?|Corp\.?|Co\.?|-?brand(?:ed)?)[,\s]+)+/i, '').replace(/^[,\s]+/, '');
+      if (rest.length > 3) product = rest;
+    }
+  }
+  // "Gardners Basics brand Waltham 29 Broccoli Sprouting Seeds": the label names its own brand
+  const own = product.match(/^((?:\S+\s+){1,4}?)-?brand(?:ed)?\s+(\S.{3,})$/i);
+  if (own) {
+    if (!brand) brand = own[1].trim();
+    product = own[2];
   }
 
   // "PACEARTH Swing Seats" recalled by "Pacearth Direct": say the brand once
@@ -87,9 +109,18 @@ export function recallName(r: Pick<Recall, 'title' | 'products'>): RecallName {
   }
 
   if (!product) product = r.products || title;
-  // Keep company suffixes out of the eyebrow
-  brand = brand.replace(/,?\s+(?:Inc\.?|LLC|Corp\.?|Corporation|Company|Co\.|Ltd\.?|Limited|Group|Enterprises|International|Industries|Stores|USA|U\.S\.|America|North America|Americas)$/gi, '').trim();
+  brand = brand.replace(SUFFIX, '').replace(/[\s,&]+$/, '').trim();
   if (brand.length > 34) brand = '';
+
+  // No usable brand in the headline: CPSC descriptions say "involves Steelite-branded pressure washers"
+  if (!brand && r.description) {
+    const named = r.description.match(/\b((?:[A-Z][\w'’&.]*)(?:\s+[A-Z][\w'’&.]*){0,2})[- ]brand(?:ed)?\b/);
+    if (named && !/^(?:This|The|These|Recalled|All)$/.test(named[1])) {
+      brand = named[1];
+      const lead = product.split(/\s+/);
+      if (lead.length > 1 && word(lead[0]) === word(brand.split(/\s+/)[0])) product = lead.slice(brand.split(/\s+/).length).join(' ') || product;
+    }
+  }
 
   return { product, brand, hazard };
 }
@@ -117,7 +148,9 @@ export function dailyLineup(recalls: Recall[], limit: number, fresh = 8, day = n
     const j = Math.floor(rand() * (i + 1));
     [pool[i], pool[j]] = [pool[j], pool[i]];
   }
-  return [...lead, ...pool.slice(0, Math.max(0, limit - lead.length))];
+  // Today's picks are shown newest first, so the shelf reads in date order
+  const picks = pool.slice(0, Math.max(0, limit - lead.length)).sort((a, b) => b.date.localeCompare(a.date));
+  return [...lead, ...picks];
 }
 
 const HAZARD_TAGS: [RegExp, string][] = [
@@ -129,7 +162,9 @@ const HAZARD_TAGS: [RegExp, string][] = [
   [/undeclared drug/, 'Hidden drug'],
   [/undeclared (?:ingredient|sugar|color|dye)/, 'Labeling'],
   [/undeclared|allergen/, 'Allergen'],
-  [/foreign material/, 'Foreign object'],
+  [/foreign material|foreign matter|extraneous/, 'Foreign object'],
+  [/without (?:the )?benefit of (?:import )?inspection|not inspected|uninspected/, 'Uninspected'],
+  [/misbrand|mislabel/, 'Labeling'],
   [/heavy metals/, 'Heavy metals'],
   [/spoilage/, 'Spoilage'],
   [/unsafe processing/, 'Processing'],
@@ -174,8 +209,25 @@ export function hazardTag(title: string): string {
 }
 
 /** Which agency a recall came from. FDA recalls carry an "fda-" id. */
-export function recallSource(r: Pick<Recall, 'id'>): { short: 'FDA' | 'CPSC'; name: string } {
-  return String(r.id).startsWith('fda-')
-    ? { short: 'FDA', name: 'U.S. Food and Drug Administration' }
-    : { short: 'CPSC', name: 'U.S. Consumer Product Safety Commission' };
+export function recallSource(r: Pick<Recall, 'id'>): { short: 'FDA' | 'USDA' | 'CPSC'; name: string } {
+  const id = String(r.id);
+  if (id.startsWith('fda-')) return { short: 'FDA', name: 'U.S. Food and Drug Administration' };
+  if (id.startsWith('usda-')) return { short: 'USDA', name: 'USDA Food Safety and Inspection Service' };
+  return { short: 'CPSC', name: 'U.S. Consumer Product Safety Commission' };
+}
+
+/** Readable, stable address for a recall page: "huffy-buzz-bicycles-cerana-t2-e-trikes-10961". */
+export function recallSlug(r: Pick<Recall, 'id' | 'title' | 'products'> & { description?: string }): string {
+  const n = recallName(r);
+  const words = `${n.brand} ${n.product}`.toLowerCase().normalize('NFKD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/['’.]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 70).replace(/-+$/, '');
+  return words ? `${words}-${r.id}` : String(r.id);
+}
+
+export const recallPath = (r: Parameters<typeof recallSlug>[0]) => `/recalls/${recallSlug(r)}`;
+
+/** "Huffy Buzz Bicycles Cerana T2 E-Trikes": brand and product as one readable name. */
+export function recallFullName(r: Parameters<typeof recallName>[0]): string {
+  const n = recallName(r);
+  return [n.brand, n.product].filter(Boolean).join(' ');
 }

@@ -1,5 +1,6 @@
 import type { Recall, Severity, Category } from '@/types/recalls';
 import { fetchFdaFoodRecalls } from '@/lib/fda';
+import { usdaRecalls } from '@/lib/usda';
 
 // In-memory cache: Next.js data cache can't handle the 37MB CPSC response
 let _cache: { data: Recall[]; ts: number } | null = null;
@@ -66,11 +67,22 @@ function formatDate(s: string): string {
   } catch { return s; }
 }
 
-/** Everything the site shows: CPSC consumer products plus FDA food recalls, newest first. */
+/** Everything the site shows: CPSC products, FDA food and USDA meat and poultry, newest first. */
 export async function fetchRecalls(): Promise<Recall[]> {
   // Both run together. The FDA call never throws; it returns an empty list on failure.
   const [products, food] = await Promise.all([fetchCpscRecalls(), fetchFdaFoodRecalls()]);
-  return [...products, ...food].sort((a, b) => b.date.localeCompare(a.date));
+  return [...products, ...food, ...usdaRecalls()].sort((a, b) => b.date.localeCompare(a.date));
+}
+
+/**
+ * For pages that are rendered once and then cached: one more try before giving up,
+ * so a single dropped connection does not get baked into the page for an hour.
+ */
+export async function loadRecalls(): Promise<Recall[]> {
+  try { return await fetchRecalls(); } catch {
+    await new Promise(r => setTimeout(r, 2000));
+    return fetchRecalls();
+  }
 }
 
 async function fetchCpscRecalls(): Promise<Recall[]> {

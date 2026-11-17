@@ -8,13 +8,14 @@ const fmtDay = (d: Date) => {
   return d.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
 };
 
-export function PatrolReport({ ready, firstVisit, newCount, lastVisit, streak, nickname, homeCount, homeAlerts }: {
+export function PatrolReport({ ready, firstVisit, newCount, lastVisit, streak, nickname, newName, homeCount, homeAlerts }: {
   ready: boolean;
   firstVisit: boolean;
   newCount: number;
   lastVisit: Date | null;
   streak: number;
   nickname: string;
+  newName?: boolean;
   homeCount: number;
   homeAlerts: number;
 }) {
@@ -28,7 +29,7 @@ export function PatrolReport({ ready, firstVisit, newCount, lastVisit, streak, n
         <span className="patrol-num">{streak}</span>
         <span className="patrol-label">
           {streak === 1 ? 'Day on patrol' : 'Days on patrol'}
-          <span className="patrol-sub">{nickname ? `Welcome back, ${nickname}` : firstVisit ? 'Welcome to the patrol' : 'Good to see you again'}</span>
+          <span className="patrol-sub">{nickname ? (newName || firstVisit ? `Hi, ${nickname}` : `Welcome back, ${nickname}`) : firstVisit ? 'Welcome to the patrol' : 'Good to see you again'}</span>
         </span>
       </div>
       <a href="#now-recalled" className="patrol-stat">
@@ -43,9 +44,9 @@ export function PatrolReport({ ready, firstVisit, newCount, lastVisit, streak, n
           {homeCount === 0 ? '+' : homeAlerts > 0 ? homeAlerts : '0'}
         </span>
         <span className="patrol-label">
-          {homeCount === 0 ? 'My Home' : homeAlerts > 0 ? (homeAlerts === 1 ? 'Thing to check' : 'Things to check') : 'No matches found'}
+          {homeCount === 0 ? 'My Home' : homeAlerts > 0 ? (homeAlerts === 1 ? 'Item to check' : 'Items to check') : 'No matches found'}
           <span className="patrol-sub">
-            {homeCount === 0 ? 'Add what you own' : `Scout checked ${homeCount} of your ${homeCount === 1 ? 'thing' : 'things'}`}
+            {homeCount === 0 ? 'Add what you own' : `Scout checked your ${homeCount} ${homeCount === 1 ? 'item' : 'items'}`}
           </span>
         </span>
       </a>

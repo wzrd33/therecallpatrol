@@ -26,10 +26,10 @@ export function MyHome({ items, matches, loading, coverage, onAdd, onRemove, onO
   const summary = loading
     ? 'Scout is checking your list…'
     : items.length === 0
-      ? 'List the things you own, with the model number if you have it. Scout checks them each time you visit.'
+      ? 'List the items you own, with the model number if you have it. Scout checks them each time you visit.'
       : alerts > 0
-        ? `${alerts} of your ${items.length} ${items.length === 1 ? 'thing' : 'things'} may be affected. Tap to compare the details.`
-        : `Scout checked ${items.length} ${items.length === 1 ? 'thing' : 'things'}. No matching recalls found in our current records.`;
+        ? `${alerts} of your ${items.length} ${items.length === 1 ? 'item' : 'items'} may be affected. Tap to compare the details.`
+        : `Scout checked ${items.length} ${items.length === 1 ? 'item' : 'items'}. No matching recalls found in our current records.`;
 
   return (
     <section id="my-home" className="panel scroll-mt-20" aria-labelledby="my-home-title">
@@ -117,7 +117,7 @@ export function MyHome({ items, matches, loading, coverage, onAdd, onRemove, onO
       )}
 
       <p className="text-white/45 text-xs mt-3">
-        {coverage ? `Checked against ${coverage}. ` : ''}Older recalls, meat and poultry, medicine and vehicles are not covered, so no match is not a guarantee that a product is safe. Your list is saved on this device only.
+        {coverage ? `Checked against ${coverage}. ` : ''}Older recalls, {coverage.includes('USDA') ? '' : 'meat and poultry, '}medicine and vehicles are not covered, so no match is not a guarantee that a product is safe. Your list is saved on this device only.
       </p>
     </section>
   );

@@ -2,12 +2,12 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Search, X } from 'lucide-react';
-import { hazardTag } from '@/utils/recall-name';
+import { hazardTag, recallName } from '@/utils/recall-name';
 import type { Recall } from '@/types/recalls';
 import { useLists } from '@/lib/lists';
 import { RecallSheet, recallEmoji } from '@/components/recall-sheet';
 
-const MAX_RESULTS = 25;
+const PAGE = 25;
 
 export function ProductSearch() {
   const [open, setOpen] = useState(false);
@@ -15,6 +15,7 @@ export function ProductSearch() {
   const [recalls, setRecalls] = useState<Recall[] | null>(null);
   const [failed, setFailed] = useState(false);
   const [selected, setSelected] = useState<Recall | null>(null);
+  const [limit, setLimit] = useState(PAGE);
   const inputRef = useRef<HTMLInputElement>(null);
   const { added, toggle } = useLists();
 
@@ -68,7 +69,11 @@ export function ProductSearch() {
       .sort((a, b) => b.score - a.score || b.r.date.localeCompare(a.r.date));
   }, [recalls, terms]);
 
-  const shown = matches.slice(0, MAX_RESULTS);
+  // A new search starts back at the first page
+  useEffect(() => { setLimit(PAGE); }, [query]);
+
+  const shown = matches.slice(0, limit);
+  const left = matches.length - shown.length;
 
   return (
     <>
@@ -123,15 +128,19 @@ export function ProductSearch() {
               {shown.length > 0 && (
                 <>
                   <p className="px-4 pt-3 pb-1 text-[11px] font-bold uppercase tracking-widest text-cyan-light">
-                    {matches.length} {matches.length === 1 ? 'recall' : 'recalls'} found
-                    {matches.length > MAX_RESULTS && ` · showing first ${MAX_RESULTS}`}
+                    {matches.length} potentially related {matches.length === 1 ? 'recall' : 'recalls'}
+                    {left > 0 && ` · showing ${shown.length}`}
+                  </p>
+                  <p className="px-4 pb-2 text-xs text-white/70 leading-snug">
+                    These mention “{query.trim()}” but may not be your product. Check the brand, lot or model number, and expiration date to see if yours is affected.
                   </p>
                   <ul className="p-2 pt-1">
-                    {shown.map(({ r }) => (
+                    {shown.map(({ r }) => { const brand = recallName(r).brand; return (
                       <li key={r.id}>
                         <button type="button" onClick={() => setSelected(r)} className="search-hit">
                           <span className="text-2xl flex-shrink-0" aria-hidden="true">{recallEmoji(r)}</span>
                           <span className="block flex-1 min-w-0">
+                            {brand && <span className="block text-cyan-light text-[11px] font-bold uppercase tracking-wider truncate mb-0.5">{brand}</span>}
                             <span className="block text-white text-sm font-bold leading-snug line-clamp-2" style={{ fontFamily: "'Space Grotesk',sans-serif" }}>{r.products || r.title}</span>
                             <span className="flex items-center gap-2 flex-wrap mt-1.5">
                               <span className="sev-badge" data-sev={r.severity}>{hazardTag(r.title)}</span>
@@ -141,8 +150,15 @@ export function ProductSearch() {
                           <span className="text-yellow text-lg flex-shrink-0" aria-hidden="true">›</span>
                         </button>
                       </li>
-                    ))}
+                    ); })}
                   </ul>
+                  {left > 0 && (
+                    <div className="px-4 pb-4">
+                      <button type="button" onClick={() => setLimit(l => l + PAGE)} className="tap w-full rounded-full border border-white/30 text-white text-sm font-bold py-3 hover:bg-white/10">
+                        Show {Math.min(PAGE, left)} more
+                      </button>
+                    </div>
+                  )}
                 </>
               )}
             </div>

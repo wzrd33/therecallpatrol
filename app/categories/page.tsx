@@ -1,4 +1,11 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
+
+export const metadata: Metadata = {
+  title: 'Recall Categories: Kids, Food, Household, Pets and Outdoors',
+  description: 'Browse U.S. product and food recalls by part of the home: kids and baby, pantry, refrigerator, household, pets, and outdoors and sports.',
+  alternates: { canonical: '/categories' },
+};
 
 const CATEGORIES = [
   { slug: 'kids',         label: 'Kids & Baby',  emoji: '🧸', desc: 'Toys, clothing, car seats, cribs, strollers, and more.', color: '#B026FF' },

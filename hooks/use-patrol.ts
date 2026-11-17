@@ -14,14 +14,15 @@ export const PROFILE_EVENT = 'rp-profile';
 
 const dayKey = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 
-export interface Profile { nickname: string; email?: string; zip?: string }
+export interface Profile { nickname: string; email?: string; zip?: string; /** Day the nickname was first saved */ since?: string }
 
 export function readProfile(): Profile | null {
   try { return JSON.parse(localStorage.getItem(PROFILE_KEY) ?? 'null'); } catch { return null; }
 }
 export function saveProfile(p: Profile) {
   try {
-    localStorage.setItem(PROFILE_KEY, JSON.stringify(p));
+    const since = readProfile()?.since ?? dayKey(new Date());
+    localStorage.setItem(PROFILE_KEY, JSON.stringify({ ...p, since }));
     window.dispatchEvent(new Event(PROFILE_EVENT));
   } catch {}
 }
@@ -35,6 +36,7 @@ export function usePatrol(recalls: Recall[]) {
   const [lastVisit, setLastVisit] = useState<Date | null>(null);
   const [streak, setStreak] = useState(0);
   const [nickname, setNickname] = useState('');
+  const [newName, setNewName] = useState(false); // nickname first saved today: greet, don't "welcome back"
 
   // Day streak: +1 if the last visit was yesterday, unchanged if today, otherwise start again at 1
   useEffect(() => {
@@ -47,7 +49,9 @@ export function usePatrol(recalls: Recall[]) {
       else if (saved?.day === dayKey(y)) count = saved.count + 1;
       localStorage.setItem(STREAK_KEY, JSON.stringify({ count, day: today }));
       setStreak(count);
-      setNickname(readProfile()?.nickname ?? '');
+      const profile = readProfile();
+      setNickname(profile?.nickname ?? '');
+      setNewName(profile?.since === today);
     } catch { setStreak(1); }
   }, []);
 
@@ -76,5 +80,5 @@ export function usePatrol(recalls: Recall[]) {
     return ids;
   }, [recalls, baseline]);
 
-  return { ready: baseline !== null, firstVisit: baseline === '', newIds, lastVisit, streak, nickname };
+  return { ready: baseline !== null, firstVisit: baseline === '', newIds, lastVisit, streak, nickname, newName };
 }

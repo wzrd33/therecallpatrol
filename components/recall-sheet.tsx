@@ -2,87 +2,12 @@
 
 import { useEffect, useRef } from 'react';
 import type { Recall } from '@/types/recalls';
-import { recallName, hazardTag, recallSource } from '@/utils/recall-name';
+import { recallName, hazardTag, recallSource, recallPath } from '@/utils/recall-name';
+import { recallEmoji } from '@/utils/recall-emoji';
 
 
-const FOOD_EMOJI: [RegExp, string][] = [
-  [/ice cream|gelato/, '🍨'],
-  [/cheese|queso/, '🧀'],
-  [/milk|yogurt|dairy/, '🥛'],
-  [/popcorn/, '🍿'],
-  [/chips|crisps|snack/, '🥨'],
-  [/cookie|brownie|cake|muffin|pastry|donut/, '🍪'],
-  [/chocolate|candy|gumm/, '🍫'],
-  [/bread|bagel|tortilla|bun\b/, '🍞'],
-  [/salad|sprouts|lettuce|spinach|cucumber|vegetable/, '🥗'],
-  [/noodle|ramen|pasta/, '🍜'],
-  [/peanut|nut\b|nuts\b|almond|pistachio/, '🥜'],
-  [/\beggs?\b/, '🥚'],
-  [/salmon\b|shrimp|fish|seafood|oyster|tuna/, '🐟'],
-  [/juice|drink|beverage|tea\b|coffee|water/, '🧃'],
-  [/sauce|salsa|hummus|dip\b|honey|jelly|jam\b/, '🍯'],
-  [/supplement|vitamin|capsule|tablet/, '💊'],
-];
-
-const PRODUCT_EMOJI: [RegExp, string][] = [
-  [/toy|doll|plush|playset|game/, '🧸'],
-  [/power bank|battery|batteries|charger/, '🔋'],
-  [/fire pit|fireplace|lighter|torch|candle/, '🔥'],
-  [/heater|boiler|furnace/, '🌡️'],
-  [/dresser|chest|nightstand/, '🗄️'],
-  [/mattress|bed rail|\bbeds?\b|pillow|lounger|sleeper|crib|bassinet/, '🛏️'],
-  [/chair|recliner|stool|sofa/, '🪑'],
-  [/pajama|sleepwear|loungewear|nightgown|robe|jacket|hoodie|sweat|costume/, '👕'],
-  [/helmet/, '⛑️'],
-  [/e-bike|bicycle|\bbikes?\b|trike/, '🚴'],
-  [/scooter/, '🛴'],
-  [/motorcycle|atv|off-road|off-highway|golf car|vehicle|snowmobile/, '🏍️'],
-  [/stroller|car seat/, '🚼'],
-  [/magnet/, '🧲'],
-  [/pressure washer|faucet|shower|pool|spa\b/, '💦'],
-  [/lamp|light|lantern|luminaire|chandelier/, '💡'],
-  [/coffee|espresso|kettle|mug|tumbler|cup|bottle/, '☕'],
-  [/fryer|cooker|oven|range|grill|microwave|toaster|pan\b/, '🍳'],
-  [/refrigerator|fridge|freezer|cooler/, '🧊'],
-  [/hair dryer|hair|beard/, '💇'],
-  [/ladder/, '🪜'],
-  [/mower|trimmer|chainsaw|blower|saw\b|drill|tool/, '🛠️'],
-  [/fan\b|fans\b|air conditioner/, '🌀'],
-  [/smoke|alarm|detector/, '🚨'],
-  [/speaker|headphone|amplifier/, '🔊'],
-];
-
-export function recallEmoji(r: Recall): string {
-  const t = r.title.toLowerCase();
-  if (String(r.id).startsWith('fda-')) {
-    for (const [re, emoji] of FOOD_EMOJI) if (re.test(t)) return emoji;
-    return r.category === 'refrigerator' ? '🧊' : '🥫';
-  }
-  // Picture the product itself where the name makes it obvious
-  const subject = t.split(/ due | recalled /)[0];
-  for (const [re, emoji] of PRODUCT_EMOJI) if (re.test(subject)) return emoji;
-  if (r.category === 'kids') {
-    if (t.includes('stroller') || t.includes('car seat')) return '🚗';
-    if (t.includes('toy') || t.includes('game')) return '🧸';
-    return '🍼';
-  }
-  if (r.category === 'pantry') {
-    if (t.includes('peanut')) return '🥜';
-    if (t.includes('chicken') || t.includes('meat')) return '🍗';
-    return '🥫';
-  }
-  if (r.category === 'refrigerator') return t.includes('refrigerat') ? '❄️' : '🧊';
-  if (r.category === 'household') {
-    if (t.includes('cable') || t.includes('charger')) return '🔌';
-    if (t.includes('fan') || t.includes('heater')) return '🌡️';
-    return '🏠';
-  }
-  if (r.category === 'pets') return '🐶';
-  if (r.category === 'other') return '🏕️';
-  if (t.includes('fire') || t.includes('burn')) return '🔥';
-  if (t.includes('food')) return '🍽️';
-  return '⚠️';
-}
+// Kept here so existing imports keep working; the logic is shared with server pages
+export { recallEmoji };
 
 export function RecallSheet({ recall, isAdded, onToggle, onClose }: {
   recall: Recall;
@@ -146,7 +71,9 @@ export function RecallSheet({ recall, isAdded, onToggle, onClose }: {
             <div className="mb-2">
               <p className="sheet-label">How to identify it</p>
               <p className="text-white/80 text-sm leading-relaxed whitespace-pre-line">{recall.description}</p>
-              <p className="text-white/50 text-xs mt-3">Source: {recallSource(recall).name}.</p>
+              <p className="text-white/50 text-xs mt-3">
+                Source: {recallSource(recall).name}. <a href={recallPath(recall)} className="underline underline-offset-2 text-white/70 hover:text-white">Open as a page to share</a>
+              </p>
             </div>
           )}
         </div>

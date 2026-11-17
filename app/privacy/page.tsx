@@ -2,7 +2,8 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'Privacy | Recall Patrol',
+  title: 'Privacy',
+  alternates: { canonical: '/privacy' },
   description: 'What Recall Patrol stores, and where.',
 };
 
@@ -22,7 +23,7 @@ export default function PrivacyPage() {
 
         <H2>What stays on your device</H2>
         <ul className="list-disc pl-5 space-y-1">
-          <li>Your nickname, email address and zip code from the sign-up form.</li>
+          <li>Your nickname, plus your email address and zip code if you choose to add them.</li>
           <li>The products you add to My Home.</li>
           <li>Recalls you add to your watchlist.</li>
           <li>The date of your last visit and your patrol streak.</li>

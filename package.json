@@ -3,7 +3,9 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "usda": "node scripts/import-usda.mjs",
+    "usda:ship": "node scripts/import-usda.mjs --ship"
   },
   "dependencies": {
     "@radix-ui/react-checkbox": "^1.1.1",

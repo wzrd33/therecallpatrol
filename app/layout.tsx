@@ -3,16 +3,18 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { ProductSearch } from '@/components/product-search';
 import { AccountButton } from '@/components/account-button';
+import { JsonLd } from '@/components/json-ld';
 import './globals.css';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://therecallpatrol.com'),
-  title: 'Recall Patrol | Guard Your Home',
-  description: 'Check what you own against U.S. recalls: food, toys, appliances, furniture, and more. Free household safety tracking.',
+  title: { default: 'Recall Patrol | Check Product and Food Recalls for Your Home', template: '%s | Recall Patrol' },
+  description: 'Search the latest U.S. product and food recalls from CPSC, FDA and USDA, and check what you own: toys, appliances, furniture, food, and more. Free.',
   openGraph: {
-    title: 'Recall Patrol | Guard Your Home',
+    title: 'Recall Patrol | Check Product and Food Recalls for Your Home',
     description: 'Check what you own against U.S. food and product recalls.',
     url: 'https://therecallpatrol.com',
+    locale: 'en_US',
     siteName: 'Recall Patrol',
     type: 'website',
   },
@@ -23,9 +25,17 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body className="min-h-screen flex flex-col bg-background text-foreground">
+        <JsonLd data={{
+          '@context': 'https://schema.org',
+          '@type': 'WebSite',
+          name: 'Recall Patrol',
+          url: 'https://therecallpatrol.com',
+          description: 'U.S. product and food recalls from CPSC, FDA and USDA, checked against what you own.',
+          publisher: { '@type': 'Organization', name: 'Recall Patrol', url: 'https://therecallpatrol.com', logo: 'https://therecallpatrol.com/images/logo.svg' },
+        }} />
         {/* Nav */}
         <header className="sticky top-0 z-50 bg-navy border-b-2 border-magenta">
-          <div className="max-w-6xl mx-auto px-4 h-14 flex items-center gap-3">
+          <div className="max-w-6xl mx-auto px-3 sm:px-4 h-14 flex items-center gap-1.5 sm:gap-3">
             <Link href="/" className="flex items-center gap-2 flex-shrink-0 py-1">
               <Image src="/images/scout-logo.webp" alt="Scout" width={36} height={36} className="rounded-md" />
               <span style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 800, fontSize: '0.9rem', color: 'white', lineHeight: 1.1 }}>
