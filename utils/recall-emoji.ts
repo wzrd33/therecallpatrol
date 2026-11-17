@@ -58,7 +58,7 @@ export function recallEmoji(r: Recall): string {
     // Picture the food, not the reason: "Seasoning ... Due to Undeclared Milk" is not milk
     const food = t.split(/ due to /)[0].replace(/^.*? recalls /, '');
     for (const [re, emoji] of FOOD_EMOJI) if (re.test(food)) return emoji;
-    return r.category === 'refrigerator' ? '🧊' : '🥫';
+    return r.category === 'refrigerator' ? '🥛' : '🥫';
   }
   // Picture the product itself where the name makes it obvious
   const subject = t.split(/ due | recalled /)[0];
@@ -73,7 +73,7 @@ export function recallEmoji(r: Recall): string {
     if (t.includes('chicken') || t.includes('meat')) return '🍗';
     return '🥫';
   }
-  if (r.category === 'refrigerator') return t.includes('refrigerat') ? '❄️' : '🧊';
+  if (r.category === 'refrigerator') return t.includes('refrigerat') ? '❄️' : '🥛';
   if (r.category === 'household') {
     if (t.includes('cable') || t.includes('charger')) return '🔌';
     if (t.includes('fan') || t.includes('heater')) return '🌡️';

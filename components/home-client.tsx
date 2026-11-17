@@ -17,7 +17,7 @@ import { recallName, dailyLineup, hazardTag, recallSource, recallPath } from '@/
 const CATEGORIES = [
   { slug: 'kids',         label: 'Kids',      emoji: '🧸', color: '#B026FF' },
   { slug: 'pantry',       label: 'Pantry',    emoji: '🥫', color: '#19E57A' },
-  { slug: 'refrigerator', label: 'Fridge',    emoji: '🧊', color: '#00C9D7' },
+  { slug: 'refrigerator', label: 'Fridge',    emoji: '🥛', color: '#00C9D7' },
   { slug: 'household',    label: 'Household', emoji: '🏠', color: '#FF9A1A' },
   { slug: 'pets',         label: 'Pets',      emoji: '🐶', color: '#FF2B85' },
   // The feed files sports, vehicles and outdoor gear under 'other'
@@ -247,9 +247,9 @@ export function HomeClient({ initial, counts }: { initial: Recall[]; counts: Rec
       {/* Category grid */}
       <section className="bg-navy border-t border-white/10">
       <div className="max-w-6xl mx-auto px-4 pt-8 pb-12">
-        <p className="text-xs font-bold uppercase tracking-widest text-cyan mb-1">Browse</p>
+        <p className="text-xs font-bold uppercase tracking-widest text-cyan mb-1">Scout&apos;s on watch</p>
         <h2 className="text-white text-2xl font-extrabold mb-5" style={{ fontFamily: "'Space Grotesk',sans-serif" }}>
-          Scout's <span className="text-magenta">On Watch</span>
+          Browse <span className="text-magenta">Categories</span>
         </h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
           {CATEGORIES.map(c => {

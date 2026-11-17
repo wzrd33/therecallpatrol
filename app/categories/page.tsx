@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 const CATEGORIES = [
   { slug: 'kids',         label: 'Kids & Baby',  emoji: '🧸', desc: 'Toys, clothing, car seats, cribs, strollers, and more.', color: '#B026FF' },
   { slug: 'pantry',       label: 'Pantry',       emoji: '🥫', desc: 'Shelf-stable food: snacks, baking mixes, spices, canned goods, and supplements.', color: '#19E57A' },
-  { slug: 'refrigerator', label: 'Refrigerator', emoji: '🧊', desc: 'Chilled and frozen food: dairy, produce, seafood, and ready meals.',    color: '#00C9D7' },
+  { slug: 'refrigerator', label: 'Refrigerator', emoji: '🥛', desc: 'Chilled and frozen food: dairy, produce, seafood, and ready meals.',    color: '#00C9D7' },
   { slug: 'household',    label: 'Household',    emoji: '🏠', desc: 'Furniture, appliances, kitchen gear, electronics, tools, and more.',   color: '#FF9A1A' },
   { slug: 'outdoors',     label: 'Outdoors & Sports', emoji: '⛺', desc: 'Bikes, e-bikes, off-road vehicles, helmets, and sports gear.', color: '#FFDC28' },
   { slug: 'pets',        label: 'Pets',         emoji: '🐶', desc: 'Pet toys, gear, and accessories.',  color: '#FF2B85' },
