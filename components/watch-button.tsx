@@ -8,7 +8,7 @@ export function WatchButton({ item }: { item: ListItem }) {
   const on = !!added[item.id];
   return (
     <button type="button" aria-pressed={on} data-added={on} onClick={() => toggle(item)} className="tap add-btn flex-1 rounded-full text-sm px-4">
-      {on ? '✓ On my watchlist' : '+ Add to watchlist'}
+      {on ? '✓ Watching' : '+ Watch this recall'}
     </button>
   );
 }

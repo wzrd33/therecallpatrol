@@ -118,7 +118,7 @@ export function HomeClient({ initial, counts }: { initial: Recall[]; counts: Rec
           {/* One obvious first step; the other two ways in are quieter links below it */}
           <SearchLauncher className="max-w-md mx-auto" />
           <p className="mt-4 text-sm text-white/70">
-            or <Link href="/#my-home" className="text-white font-bold underline underline-offset-4 decoration-magenta decoration-2 hover:text-yellow">check your home</Link>
+            or <Link href="/my-home" className="text-white font-bold underline underline-offset-4 decoration-magenta decoration-2 hover:text-yellow">check your home</Link>
             {' · '}
             <Link href="/categories" className="text-white font-bold underline underline-offset-4 decoration-cyan decoration-2 hover:text-yellow">browse categories</Link>
           </p>
@@ -217,7 +217,7 @@ export function HomeClient({ initial, counts }: { initial: Recall[]; counts: Rec
                         data-added={!!added[r.id]}
                         className="tap add-btn w-full rounded-lg text-sm"
                       >
-                        {added[r.id] ? '✓ Added' : '+ Add'}
+                        {added[r.id] ? '✓ Watching' : '+ Watch'}
                       </button>
                       <a
                         href={r.url}
@@ -241,7 +241,7 @@ export function HomeClient({ initial, counts }: { initial: Recall[]; counts: Rec
         <section className="bg-navy border-t border-white/10 px-4 py-8">
           <div className="max-w-6xl mx-auto grid gap-4 lg:grid-cols-2 items-start">
             <RecallOfDay recall={recallOfDay} onOpen={setSelected} />
-            <MyHome items={homeItems} matches={homeMatches} loading={loading} coverage={coverage} onAdd={addItem} onRemove={removeItem} onOpen={setSelected} />
+            <MyHome items={homeItems} matches={homeMatches} loading={loading} coverage={coverage} onAdd={addItem} onRemove={removeItem} onOpen={setSelected} compact watching={Object.keys(added).length} />
           </div>
         </section>
       )}

@@ -21,9 +21,8 @@ export function CategoryClient({ slug, initial, total }: { slug: string; initial
   const [count, setCount] = useState(total);
   const [loading, setLoading] = useState(initial.length === 0);
   const [failed, setFailed] = useState(false);
-  const { added, toggle, getByCategory } = useLists();
+  const { added, toggle } = useLists();
   const [selected, setSelected] = useState<Recall | null>(null);
-  const [listItems, setListItems] = useState<ReturnType<typeof getByCategory>>([]);
 
   useEffect(() => {
     fetch('/api/recalls')
@@ -39,10 +38,6 @@ export function CategoryClient({ slug, initial, total }: { slug: string; initial
       .catch(() => { setFailed(initial.length === 0); setLoading(false); });
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dataCategory]);
-
-  useEffect(() => {
-    setListItems(getByCategory(dataCategory));
-  }, [added, dataCategory, getByCategory]);
 
   return (
     <div className="bg-navy text-white flex-1" style={{ '--cat': meta.color } as React.CSSProperties}>
@@ -132,7 +127,7 @@ export function CategoryClient({ slug, initial, total }: { slug: string; initial
                     data-added={!!added[r.id]}
                     className="tap add-btn flex-1 px-4 rounded-full text-sm"
                   >
-                    {added[r.id] ? '✓ Added' : '+ Add'}
+                    {added[r.id] ? '✓ Watching' : '+ Watch'}
                   </button>
                   <a
                     href={r.url}
@@ -148,35 +143,11 @@ export function CategoryClient({ slug, initial, total }: { slug: string; initial
           </div>
         </section>
 
-        {/* My list for this category */}
-        <section>
-          <h2 className="font-bold text-base mb-3" style={{ fontFamily: "'Space Grotesk',sans-serif" }}>
-            My {meta.label} Watchlist
-          </h2>
-          {listItems.length === 0 ? (
-            <div className="border-2 border-dashed border-white/20 rounded-xl p-8 text-center text-white/60">
-              <div className="text-3xl mb-2">🐶</div>
-              <p className="text-sm">Nothing added yet. Tap <strong>+ Add</strong> on any recall above.</p>
-            </div>
-          ) : (
-            <div className="space-y-2">
-              {listItems.map(item => (
-                <div key={item.id} className="recall-card pl-5 pr-2 py-1.5 flex items-center gap-3">
-                  <div className="flex-1 font-semibold text-sm truncate">{item.title}</div>
-                  <span className="sev-pill flex-shrink-0" data-on-dark="" data-sev={item.severity}>{hazardTag(item.title)}</span>
-                  <button
-                    type="button"
-                    aria-label={`Remove ${item.title} from watchlist`}
-                    onClick={() => toggle(item)}
-                    className="tap w-11 h-11 rounded-full text-white/60 text-xl hover:bg-magenta hover:text-white flex-shrink-0"
-                  >
-                    ×
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
-        </section>
+        <p className="text-white/70 text-sm">
+          Recalls you tap <strong className="text-white">+ Watch</strong> on are kept in{' '}
+          <Link href="/my-home" className="text-white font-bold underline underline-offset-4 decoration-magenta decoration-2 hover:text-yellow">My Home</Link>
+          {Object.keys(added).length > 0 ? ` (${Object.keys(added).length} so far).` : '.'}
+        </p>
       </div>
 
       {selected && (

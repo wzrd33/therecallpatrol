@@ -10,7 +10,7 @@ const AI_CRAWLERS = [
 ];
 
 export default function robots(): MetadataRoute.Robots {
-  const open = { allow: '/', disallow: ['/api/', '/signup'] };
+  const open = { allow: '/', disallow: ['/api/', '/signup', '/my-home'] };
   return {
     rules: [
       { userAgent: '*', ...open },

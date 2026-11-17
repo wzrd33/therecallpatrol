@@ -30,11 +30,9 @@ export function useLists() {
       if (!next[item.id]) delete next[item.id];
       try {
         let items: ListItem[] = JSON.parse(localStorage.getItem(KEY) ?? '[]');
-        if (next[item.id]) {
-          items.push(item);
-        } else {
-          items = items.filter(i => i.id !== item.id);
-        }
+        // Remove first so a repeated call can never store the same recall twice
+        items = items.filter(i => i.id !== item.id);
+        if (next[item.id]) items.push(item);
         localStorage.setItem(KEY, JSON.stringify(items));
       } catch {}
       return next;
@@ -42,7 +40,11 @@ export function useLists() {
   }, []);
 
   const getAll = useCallback((): ListItem[] => {
-    try { return JSON.parse(localStorage.getItem(KEY) ?? '[]'); } catch { return []; }
+    try {
+      const items: ListItem[] = JSON.parse(localStorage.getItem(KEY) ?? '[]');
+      // Lists saved before the fix above may hold repeats
+      return items.filter((x, i) => items.findIndex(y => y.id === x.id) === i);
+    } catch { return []; }
   }, []);
 
   const getByCategory = useCallback((cat: string): ListItem[] => {

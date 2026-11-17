@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import type { Recall } from '@/types/recalls';
 import type { HomeItem } from '@/hooks/use-home-items';
 import type { OwnedMatch } from '@/utils/recall-match';
@@ -8,7 +9,7 @@ import { recallName } from '@/utils/recall-name';
 
 const EXAMPLES = ['Space heater', 'Air fryer', 'Power bank', 'Peanut butter'];
 
-export function MyHome({ items, matches, loading, coverage, onAdd, onRemove, onOpen }: {
+export function MyHome({ items, matches, loading, coverage, onAdd, onRemove, onOpen, compact = false, watching = 0 }: {
   items: HomeItem[];
   matches: Record<string, OwnedMatch[]>;
   loading: boolean;
@@ -17,6 +18,10 @@ export function MyHome({ items, matches, loading, coverage, onAdd, onRemove, onO
   onAdd: (name: string) => void;
   onRemove: (id: string) => void;
   onOpen: (r: Recall) => void;
+  /** Home page version: the add box and a summary, with the full list on the My Home page */
+  compact?: boolean;
+  /** How many recalls are on the watchlist, for the compact summary */
+  watching?: number;
 }) {
   const [draft, setDraft] = useState('');
   const [expanded, setExpanded] = useState<string | null>(null);
@@ -28,12 +33,12 @@ export function MyHome({ items, matches, loading, coverage, onAdd, onRemove, onO
     : items.length === 0
       ? 'List the items you own, with the model number if you have it. Scout checks them each time you visit.'
       : alerts > 0
-        ? `${alerts} of your ${items.length} ${items.length === 1 ? 'item' : 'items'} may be affected. Tap to compare the details.`
+        ? `${alerts} of your ${items.length} ${items.length === 1 ? 'item has' : 'items have'} possibly related recalls. ${compact ? 'Open My Home to compare the details.' : 'Tap one to compare the details.'}`
         : `Scout checked ${items.length} ${items.length === 1 ? 'item' : 'items'}. No matching recalls found in our current records.`;
 
   return (
     <section id="my-home" className="panel scroll-mt-20" aria-labelledby="my-home-title">
-      <p className="panel-eyebrow">My Home</p>
+      <p className="panel-eyebrow">{compact ? 'My Home' : 'Items I own'}</p>
       <h2 id="my-home-title" className="panel-title">What's in <span className="text-magenta">your house?</span></h2>
       <p className="text-white/70 text-sm mb-4" aria-live="polite">{summary}</p>
 
@@ -64,7 +69,16 @@ export function MyHome({ items, matches, loading, coverage, onAdd, onRemove, onO
         </div>
       )}
 
-      {items.length > 0 && (
+      {compact && (items.length > 0 || watching > 0) && (
+        <Link href="/my-home" className="btn-secondary w-full mt-1">
+          Open My Home
+          <span className="font-normal opacity-80">
+            {' '}· {items.length} {items.length === 1 ? 'item' : 'items'}{watching > 0 ? `, ${watching} watched` : ''}
+          </span>
+        </Link>
+      )}
+
+      {!compact && items.length > 0 && (
         <ul className="divide-y divide-white/10">
           {items.map(item => {
             const hits = matches[item.id] ?? [];
@@ -80,9 +94,11 @@ export function MyHome({ items, matches, loading, coverage, onAdd, onRemove, onO
                       type="button"
                       aria-expanded={open}
                       onClick={() => setExpanded(open ? null : item.id)}
-                      className="tap px-3 rounded-full text-xs bg-magenta text-white"
+                      data-strong={hits.some(h => h.kind === 'model')}
+                      className="tap px-3 rounded-full text-xs font-bold whitespace-nowrap bg-yellow text-navy data-[strong=true]:bg-magenta data-[strong=true]:text-white"
                     >
-                      ⚠ {hits.length} {hits.length === 1 ? 'recall' : 'recalls'} {open ? '▴' : '▾'}
+                      {/* A model number match is a real warning; a name match only says "look closer" */}
+                      {hits.some(h => h.kind === 'model') ? `⚠ ${hits.length} to check` : `${hits.length} possibly related`} {open ? '▴' : '▾'}
                     </button>
                   ) : (
                     <span className="text-white/60 text-xs font-bold whitespace-nowrap">No match found</span>
@@ -91,6 +107,12 @@ export function MyHome({ items, matches, loading, coverage, onAdd, onRemove, onO
                 </div>
                 {open && hits.length > 0 && (
                   <ul className="pb-2 pl-1 space-y-1">
+                    {hits.length > 5 && !/\s/.test(item.name.trim()) && (
+                      <li className="px-3 py-2 text-white/70 text-xs leading-snug">
+                        “{item.name}” is a broad word, so this includes any recall that mentions it. Add the brand or model
+                        (for example “Horizon {item.name.toLowerCase()}”) to narrow it down.
+                      </li>
+                    )}
                     {hits.slice(0, 8).map(({ recall: r, kind, model }) => (
                       <li key={r.id}>
                         <button type="button" onClick={() => onOpen(r)} className="search-hit !min-h-[44px] !py-2">

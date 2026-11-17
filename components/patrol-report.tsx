@@ -39,7 +39,7 @@ export function PatrolReport({ ready, firstVisit, newCount, lastVisit, streak, n
           <span className="patrol-sub">{firstVisit ? 'Scout will flag new ones next time' : newCount > 0 ? since : `Nothing new ${since}`}</span>
         </span>
       </a>
-      <a href="#my-home" className="patrol-stat">
+      <a href="/my-home" className="patrol-stat">
         <span className="patrol-num" data-tone={homeAlerts > 0 ? 'alert' : undefined}>
           {homeCount === 0 ? '+' : homeAlerts > 0 ? homeAlerts : '0'}
         </span>

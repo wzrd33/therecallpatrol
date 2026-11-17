@@ -28,7 +28,7 @@ export default function NicknamePage() {
         <div className="text-6xl mb-4" aria-hidden="true">🐶</div>
         <h1 className="text-2xl font-extrabold mb-2" style={{ fontFamily: "'Space Grotesk',sans-serif" }}>Saved. Hi, {nickname.trim()}!</h1>
         <p className="text-white/70 mb-6 max-w-sm">Your nickname is saved on this device. Tell Scout what's in your house so it can check it every time you visit.</p>
-        <Link href="/#my-home" className="btn-primary">Go to My Home</Link>
+        <Link href="/my-home" className="btn-primary">Go to My Home</Link>
         <button type="button" onClick={() => { setExisting(true); setSaved(false); }} className="mt-4 text-sm text-white/60 underline underline-offset-4 hover:text-white">
           Change it again
         </button>

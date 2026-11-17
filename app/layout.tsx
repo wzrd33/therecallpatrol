@@ -3,6 +3,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { ProductSearch } from '@/components/product-search';
 import { AccountButton } from '@/components/account-button';
+import { House } from 'lucide-react';
 import { JsonLd } from '@/components/json-ld';
 import './globals.css';
 
@@ -39,7 +40,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <div className="max-w-6xl mx-auto px-3 sm:px-4 h-14 flex items-center gap-1.5 sm:gap-3">
             <Link href="/" className="flex items-center gap-2 flex-shrink-0 py-1">
               <Image src="/images/scout-logo.webp" alt="Scout" width={36} height={36} className="rounded-md" />
-              <span style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 800, fontSize: '0.9rem', color: 'white', lineHeight: 1.1 }}>
+              {/* The badge already carries the name, so the wordmark steps aside on small phones */}
+              <span className="max-[430px]:hidden" style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 800, fontSize: '0.9rem', color: 'white', lineHeight: 1.1 }}>
                 RECALL<br /><span className="text-yellow">PATROL</span>
               </span>
             </Link>
@@ -49,6 +51,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               </Link>
               <Link href="/categories" className="px-2 sm:px-3 py-3 text-sm text-white/70 hover:text-white hover:bg-white/10 rounded-full transition-colors">
                 Categories
+              </Link>
+              <Link href="/my-home" aria-label="My Home" className="px-2 sm:px-3 py-3 text-sm text-white/70 hover:text-white hover:bg-white/10 rounded-full transition-colors flex items-center gap-1.5">
+                <House size={18} strokeWidth={2.25} aria-hidden="true" />
+                <span className="max-[430px]:hidden">My Home</span>
               </Link>
             </nav>
             <ProductSearch />

@@ -85,7 +85,7 @@ export function RecallSheet({ recall, isAdded, onToggle, onClose }: {
             data-added={isAdded}
             className="tap add-btn flex-1 rounded-full text-sm px-4"
           >
-            {isAdded ? '✓ On my watchlist' : '+ Add to watchlist'}
+            {isAdded ? '✓ Watching' : '+ Watch this recall'}
           </button>
           <a href={recall.url} target="_blank" rel="noopener noreferrer" className="tap flex-1 rounded-full text-sm px-4 border border-white/30 text-white hover:bg-white/10">
             Official notice ↗
