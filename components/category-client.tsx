@@ -8,6 +8,7 @@ import type { Recall, Category } from '@/types/recalls';
 import { useLists } from '@/lib/lists';
 import { RecallSheet } from '@/components/recall-sheet';
 import { recallName, hazardTag, recallPath } from '@/utils/recall-name';
+import { recallEmoji } from '@/utils/recall-emoji';
 
 const META = CATEGORY_META;
 
@@ -110,14 +111,14 @@ export function CategoryClient({ slug, initial, total }: { slug: string; initial
                   className="vhs-open flex gap-3 items-start flex-1 min-w-0 text-left"
                 >
                   <span className="w-11 h-11 rounded-xl flex items-center justify-center text-xl flex-shrink-0" style={{ background: `${meta.color}26`, boxShadow: `inset 0 0 0 1px ${meta.color}80` }} aria-hidden="true">
-                    {meta.emoji}
+                    {recallEmoji(r)}
                   </span>
                   <span className="block flex-1 min-w-0">
                     <span className="flex items-center gap-2 flex-wrap mb-2">
                       <span className="sev-pill" data-on-dark="" data-sev={r.severity}>{name.hazard || hazardTag(r.title)}</span>
                       <span className="text-white/60 text-xs">{r.dateFormatted}</span>
                     </span>
-                    {name.brand && <span className="block text-cyan-light text-[11px] font-bold uppercase tracking-wider mb-0.5">{name.brand}</span>}
+                    {name.brand && <span className="block text-cyan-light text-[13px] font-bold uppercase tracking-wider mb-0.5">{name.brand}</span>}
                     <span className="block font-extrabold text-lg leading-tight tracking-tight mb-1.5 line-clamp-2" style={{ fontFamily: "'Space Grotesk',sans-serif" }}>{name.product}</span>
                     <span className="block text-white/70 text-[13px] leading-relaxed line-clamp-3">{r.hazard}</span>
                     <span className="block mt-2 text-yellow text-xs font-bold">More info <span aria-hidden="true">›</span></span>

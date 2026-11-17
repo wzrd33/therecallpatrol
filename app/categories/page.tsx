@@ -37,7 +37,7 @@ export default function CategoriesPage() {
             <span className="block">
               <span className="block text-xl font-extrabold leading-tight tracking-tight" style={{ fontFamily: "'Space Grotesk',sans-serif" }}>{c.label}</span>
               <span className="block text-sm text-white/85 mt-1">{c.desc}</span>
-              <span className="block text-[11px] font-semibold uppercase tracking-wider cat-sub mt-2">
+              <span className="block text-[13px] font-semibold uppercase tracking-wider cat-sub mt-2">
                 View recalls <span className="cat-arrow" aria-hidden="true">→</span>
               </span>
             </span>

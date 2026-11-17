@@ -6,6 +6,7 @@ import Link from 'next/link';
 import type { Recall } from '@/types/recalls';
 import { useLists } from '@/lib/lists';
 import { RecallSheet, recallEmoji } from '@/components/recall-sheet';
+import { SearchLauncher } from '@/components/product-search';
 import { PatrolReport } from '@/components/patrol-report';
 import { MyHome } from '@/components/my-home';
 import { RecallOfDay, pickRecallOfDay } from '@/components/recall-of-day';
@@ -100,7 +101,7 @@ export function HomeClient({ initial, counts }: { initial: Recall[]; counts: Rec
               priority
             />
             <span
-              className="absolute -right-3 -bottom-2 rotate-6 rounded-full bg-yellow text-navy text-[11px] font-extrabold uppercase tracking-wide px-2.5 py-1 shadow-lg"
+              className="absolute -right-3 -bottom-2 rotate-6 rounded-full bg-yellow text-navy text-[13px] font-extrabold uppercase tracking-wide px-2.5 py-1 shadow-lg"
               style={{ fontFamily: "'Space Grotesk',sans-serif" }}
             >
               On patrol
@@ -112,14 +113,15 @@ export function HomeClient({ initial, counts }: { initial: Recall[]; counts: Rec
             <span className="text-magenta">Guard Your Home.</span>
           </h1>
           <p className="text-white/70 mb-6 text-base max-w-md mx-auto">
-            Check what you own against U.S. recalls: food, toys, appliances, furniture, and more.
+            Find out if something you own has been recalled: food, toys, appliances, furniture, and more.
           </p>
-          <div className="flex flex-col sm:flex-row gap-3 justify-center max-w-xs sm:max-w-none mx-auto">
-            {patrol.nickname
-              ? <Link href="/#my-home" className="btn-primary">Check My Home <span aria-hidden="true">→</span></Link>
-              : <Link href="/#my-home" className="btn-primary">Start Patrolling Free <span aria-hidden="true">→</span></Link>}
-            <Link href="/categories" className="btn-secondary">Browse by Category</Link>
-          </div>
+          {/* One obvious first step; the other two ways in are quieter links below it */}
+          <SearchLauncher className="max-w-md mx-auto" />
+          <p className="mt-4 text-sm text-white/70">
+            or <Link href="/#my-home" className="text-white font-bold underline underline-offset-4 decoration-magenta decoration-2 hover:text-yellow">check your home</Link>
+            {' · '}
+            <Link href="/categories" className="text-white font-bold underline underline-offset-4 decoration-cyan decoration-2 hover:text-yellow">browse categories</Link>
+          </p>
         </div>
       </section>
 
@@ -199,7 +201,7 @@ export function HomeClient({ initial, counts }: { initial: Recall[]; counts: Rec
                       </span>
                     </span>
                     <span className="flex-1 w-full px-2.5 flex flex-col gap-1">
-                      <span className="text-cyan-light text-[11px] font-bold uppercase tracking-wider truncate">{name.brand || `${recallSource(r).short} recall`}</span>
+                      <span className="text-cyan-light text-[13px] font-bold uppercase tracking-wider truncate">{name.brand || `${recallSource(r).short} recall`}</span>
                       <span className="text-white text-base font-extrabold leading-tight tracking-tight line-clamp-3" style={{ fontFamily: "'Space Grotesk',sans-serif" }}>{name.product}</span>
                       {name.hazard && <span className="vhs-hazard line-clamp-2">{name.hazard}</span>}
                       <span className="text-white/60 text-xs">{r.dateFormatted}</span>
@@ -264,7 +266,7 @@ export function HomeClient({ initial, counts }: { initial: Recall[]; counts: Rec
                 <span className="cat-chip" aria-hidden="true">{c.emoji}</span>
                 <span className="block">
                   <span className="block text-lg font-extrabold leading-tight tracking-tight" style={{ fontFamily: "'Space Grotesk',sans-serif" }}>{c.label}</span>
-                  <span className="block text-[11px] font-semibold uppercase tracking-wider cat-sub mt-0.5">
+                  <span className="block text-[13px] font-semibold uppercase tracking-wider cat-sub mt-0.5">
                     {count === 0 ? 'View recalls' : `${count} ${count === 1 ? 'recall' : 'recalls'}`} <span className="cat-arrow" aria-hidden="true">→</span>
                   </span>
                 </span>

@@ -8,6 +8,24 @@ import { useLists } from '@/lib/lists';
 import { RecallSheet, recallEmoji } from '@/components/recall-sheet';
 
 const PAGE = 25;
+/** Fired by a search box elsewhere on the page to open this search */
+const SEARCH_EVENT = 'rp-open-search';
+
+/** A big, obvious search field for the page body. It opens the same search as the header icon. */
+export function SearchLauncher({ className = '' }: { className?: string }) {
+  return (
+    <button
+      type="button"
+      aria-haspopup="dialog"
+      onClick={() => window.dispatchEvent(new Event(SEARCH_EVENT))}
+      className={`group w-full flex items-center gap-3 rounded-full bg-white text-left pl-5 pr-2 min-h-[58px] shadow-[0_10px_30px_-10px_rgba(255,43,133,0.7)] focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-yellow focus-visible:outline-offset-2 ${className}`}
+    >
+      <Search size={20} strokeWidth={2.5} className="text-navy/60 flex-shrink-0 max-[420px]:hidden" aria-hidden="true" />
+      <span className="flex-1 text-navy/70 text-base truncate">Search a product or brand</span>
+      <span className="rounded-full bg-magenta text-white text-sm font-bold px-4 sm:px-5 py-2.5 group-hover:opacity-90" style={{ fontFamily: "'Space Grotesk',sans-serif" }}>Search</span>
+    </button>
+  );
+}
 
 export function ProductSearch() {
   const [open, setOpen] = useState(false);
@@ -46,6 +64,12 @@ export function ProductSearch() {
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   }, [open, selected]);
+
+  useEffect(() => {
+    const onOpen = () => setOpen(true);
+    window.addEventListener(SEARCH_EVENT, onOpen);
+    return () => window.removeEventListener(SEARCH_EVENT, onOpen);
+  }, []);
 
   const terms = useMemo(() => query.toLowerCase().split(/\s+/).filter(Boolean), [query]);
 
@@ -127,7 +151,7 @@ export function ProductSearch() {
               )}
               {shown.length > 0 && (
                 <>
-                  <p className="px-4 pt-3 pb-1 text-[11px] font-bold uppercase tracking-widest text-cyan-light">
+                  <p className="px-4 pt-3 pb-1 text-[13px] font-bold uppercase tracking-widest text-cyan-light">
                     {matches.length} potentially related {matches.length === 1 ? 'recall' : 'recalls'}
                     {left > 0 && ` · showing ${shown.length}`}
                   </p>
@@ -140,7 +164,7 @@ export function ProductSearch() {
                         <button type="button" onClick={() => setSelected(r)} className="search-hit">
                           <span className="text-2xl flex-shrink-0" aria-hidden="true">{recallEmoji(r)}</span>
                           <span className="block flex-1 min-w-0">
-                            {brand && <span className="block text-cyan-light text-[11px] font-bold uppercase tracking-wider truncate mb-0.5">{brand}</span>}
+                            {brand && <span className="block text-cyan-light text-[13px] font-bold uppercase tracking-wider truncate mb-0.5">{brand}</span>}
                             <span className="block text-white text-sm font-bold leading-snug line-clamp-2" style={{ fontFamily: "'Space Grotesk',sans-serif" }}>{r.products || r.title}</span>
                             <span className="flex items-center gap-2 flex-wrap mt-1.5">
                               <span className="sev-badge" data-sev={r.severity}>{hazardTag(r.title)}</span>
