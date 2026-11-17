@@ -7,13 +7,14 @@ import { JsonLd } from '@/components/json-ld';
 import './globals.css';
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://therecallpatrol.com'),
+  metadataBase: new URL('https://www.therecallpatrol.com'),
   title: { default: 'Recall Patrol | Check Product and Food Recalls for Your Home', template: '%s | Recall Patrol' },
   description: 'Search the latest U.S. product and food recalls from CPSC, FDA and USDA, and check what you own: toys, appliances, furniture, food, and more. Free.',
+  keywords: ['product recalls', 'food recalls', 'recall lookup', 'recall check', 'CPSC recalls', 'FDA food recalls', 'USDA recalls', 'toy recalls', 'baby product recalls', 'appliance recalls', 'is my product recalled', 'recall list'],
   openGraph: {
     title: 'Recall Patrol | Check Product and Food Recalls for Your Home',
     description: 'Check what you own against U.S. food and product recalls.',
-    url: 'https://therecallpatrol.com',
+    url: 'https://www.therecallpatrol.com',
     locale: 'en_US',
     siteName: 'Recall Patrol',
     type: 'website',
@@ -29,9 +30,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           '@context': 'https://schema.org',
           '@type': 'WebSite',
           name: 'Recall Patrol',
-          url: 'https://therecallpatrol.com',
+          url: 'https://www.therecallpatrol.com',
           description: 'U.S. product and food recalls from CPSC, FDA and USDA, checked against what you own.',
-          publisher: { '@type': 'Organization', name: 'Recall Patrol', url: 'https://therecallpatrol.com', logo: 'https://therecallpatrol.com/images/logo.svg' },
+          publisher: { '@type': 'Organization', name: 'Recall Patrol', url: 'https://www.therecallpatrol.com', logo: 'https://www.therecallpatrol.com/images/logo.svg' },
         }} />
         {/* Nav */}
         <header className="sticky top-0 z-50 bg-navy border-b-2 border-magenta">

@@ -39,6 +39,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   return {
     title,
     description,
+    keywords: [`${full} recall`, name.brand && `${name.brand} recall`, `${name.product} recall`, name.hazard, `${recallSource(r).short} recall`, CATEGORY_META[categorySlug(r.category)].label + ' recalls'].filter(Boolean) as string[],
     alternates: { canonical: recallPath(r) },
     openGraph: { type: 'article', title, description, url: recallPath(r), publishedTime: r.date },
   };

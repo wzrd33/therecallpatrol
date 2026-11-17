@@ -29,6 +29,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   return {
     title,
     description,
+    keywords: [`${meta.label.toLowerCase()} recalls`, `${meta.label.toLowerCase()} recall list`, 'product recalls', 'food recalls', 'CPSC', 'FDA', 'USDA'],
     alternates: { canonical: `/categories/${slug}` },
     openGraph: { title, description, url: `/categories/${slug}` },
   };

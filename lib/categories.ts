@@ -16,4 +16,5 @@ export const CATEGORY_SLUGS = Object.keys(CATEGORY_META);
 export const dataCategory = (slug: string): Category => (slug === 'outdoors' ? 'other' : slug) as Category;
 export const categorySlug = (c: Category): string => (c === 'other' ? 'outdoors' : c);
 
-export const SITE_URL = 'https://therecallpatrol.com';
+// The bare domain redirects to www, so www is the address search engines should keep
+export const SITE_URL = 'https://www.therecallpatrol.com';
