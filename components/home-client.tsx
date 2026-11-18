@@ -223,7 +223,8 @@ export function HomeClient({ initial, counts }: { initial: Recall[]; counts: Rec
                     aria-label={`More info: ${r.title}`}
                     className="vhs-open flex-1 flex flex-col text-left"
                   >
-                    <span className="h-20 w-full flex items-center justify-center text-4xl relative flex-shrink-0">
+                    {/* Label on the top row, picture below it, so the two never overlap */}
+                    <span className="h-24 w-full flex items-end justify-center pb-1.5 text-4xl leading-none relative flex-shrink-0">
                       {recallEmoji(r)}
                       {patrol.newIds.has(r.id) && <span className="new-flag absolute top-3 left-2">New</span>}
                       <span className="sev-badge absolute top-3 right-2" data-sev={r.severity}>
