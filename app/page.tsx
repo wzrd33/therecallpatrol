@@ -18,5 +18,6 @@ export default async function HomePage() {
   const recalls: Recall[] = await loadRecalls().catch(() => []);
   const counts: Record<string, number> = {};
   recalls.forEach(r => { counts[r.category] = (counts[r.category] ?? 0) + 1; });
-  return <HomeClient initial={dailyLineup(recalls, 30)} counts={counts} />;
+  // Twice the shelf size: the browser deals 30 of these at random on each visit
+  return <HomeClient initial={dailyLineup(recalls, 60)} counts={counts} />;
 }

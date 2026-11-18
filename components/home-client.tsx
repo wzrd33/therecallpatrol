@@ -13,7 +13,7 @@ import { RecallOfDay, pickRecallOfDay } from '@/components/recall-of-day';
 import { usePatrol } from '@/hooks/use-patrol';
 import { useHomeItems } from '@/hooks/use-home-items';
 import { findOwnedMatchesDetailed, type OwnedMatch } from '@/utils/recall-match';
-import { recallName, dailyLineup, hazardTag, recallSource, recallPath } from '@/utils/recall-name';
+import { recallName, hazardTag, recallSource, recallPath } from '@/utils/recall-name';
 
 const CATEGORIES = [
   { slug: 'kids',         label: 'Kids',      emoji: '🧸', color: '#B026FF' },
@@ -46,18 +46,6 @@ export function HomeClient({ initial, counts }: { initial: Recall[]; counts: Rec
       .catch(() => { setError(true); setLoading(false); });
   }, []);
 
-  // Carousel: newest recalls first, then a fresh draw from recent months each day.
-  // Category counts below still use the full list.
-  // Recalls already on the watchlist leave the shelf (they live in My Home), and the
-  // next picks move up so the shelf stays full.
-  const latest = useMemo(() => {
-    const watched = Object.keys(added).length;
-    return dailyLineup(recalls, CAROUSEL_LIMIT + watched)
-      .filter(r => !added[r.id])
-      .slice(0, CAROUSEL_LIMIT)
-      .map(r => ({ r, name: recallName(r) }));
-  }, [recalls, added]);
-
   // A short confirmation with an undo, since the card disappears the moment it is watched
   const [moved, setMoved] = useState<{ item: ListItem; name: string } | null>(null);
   useEffect(() => {
@@ -67,6 +55,34 @@ export function HomeClient({ initial, counts }: { initial: Recall[]; counts: Rec
   }, [moved]);
 
   const patrol = usePatrol(recalls);
+
+  // Carousel. The server sends a pool (the newest recalls plus today's draw from recent
+  // months) in date order. Each page load then deals its own shelf from that pool, so a
+  // refresh shows a different mix even on days when the agencies publish nothing.
+  const [order, setOrder] = useState<string[] | null>(null);
+  useEffect(() => {
+    const ids = initial.map(r => String(r.id));
+    for (let i = ids.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [ids[i], ids[j]] = [ids[j], ids[i]];
+    }
+    setOrder(ids);
+  }, [initial]);
+
+  const latest = useMemo(() => {
+    const byId = new Map<string, Recall>();
+    initial.forEach(r => byId.set(String(r.id), r));
+    recalls.forEach(r => byId.set(String(r.id), r));
+    const dealt = order ? order.map(id => byId.get(id)).filter((r): r is Recall => !!r) : initial;
+    return dealt
+      // Watched recalls leave the shelf (they live in My Home) and the next ones move up
+      .filter(r => !added[r.id])
+      // Anything published since this visitor's last visit stays at the front
+      .map((r, i) => ({ r, i, fresh: patrol.newIds.has(r.id) }))
+      .sort((x, y) => Number(y.fresh) - Number(x.fresh) || x.i - y.i)
+      .slice(0, CAROUSEL_LIMIT)
+      .map(({ r }) => ({ r, name: recallName(r) }));
+  }, [initial, recalls, order, added, patrol.newIds]);
   const { items: homeItems, addItem, removeItem } = useHomeItems();
   const homeMatches = useMemo(() => {
     const out: Record<string, OwnedMatch[]> = {};
@@ -164,7 +180,7 @@ export function HomeClient({ initial, counts }: { initial: Recall[]; counts: Rec
             <div className="flex items-center gap-2">
               <h2 className="text-white font-bold text-lg" style={{ fontFamily: "'Space Grotesk',sans-serif" }}>📼 Now Recalled</h2>
               <span className="px-2 py-0.5 bg-magenta text-white text-xs font-bold rounded uppercase tracking-wide animate-pulse">Live</span>
-              <span className="text-white/50 text-xs max-sm:hidden">New shelf every day</span>
+              <span className="text-white/50 text-xs max-sm:hidden">Shuffled every visit</span>
               {patrol.newIds.size > 0 && (
                 <span className="px-2 py-0.5 bg-yellow text-navy text-xs font-bold rounded uppercase tracking-wide">{patrol.newIds.size} new</span>
               )}
@@ -190,7 +206,8 @@ export function HomeClient({ initial, counts }: { initial: Recall[]; counts: Rec
           {latest.length > 0 && (
             <div
               ref={trackRef}
-              className="vhs-track flex gap-3 overflow-x-auto px-4 pt-3 pb-5 scroll-px-4"
+              // Held back for a moment until this visit's shelf is dealt, so cards don't visibly swap
+              className={`vhs-track flex gap-3 overflow-x-auto px-4 pt-3 pb-5 scroll-px-4 ${order ? 'shelf-ready' : 'shelf-wait'}`}
             >
               {latest.map(({ r, name }) => (
                 <div

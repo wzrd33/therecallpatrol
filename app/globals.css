@@ -482,3 +482,9 @@
 @keyframes sheet-up { from { transform: translateY(40px); opacity: 0; } to { transform: none; opacity: 1; } }
 @keyframes sheet-fade { from { opacity: 0; } to { opacity: 1; } }
 @keyframes search-drop { from { transform: translateY(-16px); opacity: 0; } to { transform: none; opacity: 1; } }
+
+/* Home carousel: hidden until this visit's shelf is dealt. The delayed animation is a
+   safety net that shows the server's order anyway if the script never runs. */
+.shelf-wait { opacity: 0; animation: sheet-fade 0.2s ease-out 1.5s forwards; }
+.shelf-ready { animation: sheet-fade 0.25s ease-out; }
+@media (prefers-reduced-motion: reduce) { .shelf-ready { animation: none; } }
