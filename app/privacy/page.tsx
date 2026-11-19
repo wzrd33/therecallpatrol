@@ -42,7 +42,9 @@ export default function PrivacyPage() {
         <H2>What our host can see</H2>
         <p>
           Like any website, our hosting provider keeps standard server logs, such as IP address and browser
-          type, to run and protect the service. We do not use advertising trackers or sell data.
+          type, to run and protect the service. We also use our host&apos;s built-in analytics to count visits
+          and see which pages are used, so we can keep the site running well. It does not use cookies and does
+          not identify you. We do not use advertising trackers or sell data.
         </p>
 
         <H2>When this changes</H2>

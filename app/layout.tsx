@@ -5,6 +5,7 @@ import { ProductSearch } from '@/components/product-search';
 import { AccountButton } from '@/components/account-button';
 import { House } from 'lucide-react';
 import { JsonLd } from '@/components/json-ld';
+import { Analytics } from '@vercel/analytics/next';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -83,6 +84,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </span>
           </div>
         </footer>
+        <Analytics />
       </body>
     </html>
   );
