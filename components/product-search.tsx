@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { Search, X } from 'lucide-react';
 import { hazardTag, recallName } from '@/utils/recall-name';
 import type { Recall } from '@/types/recalls';
+import { loadRecallList } from '@/lib/recall-list';
 import { useLists } from '@/lib/lists';
 import { RecallSheet, recallEmoji } from '@/components/recall-sheet';
 
@@ -42,8 +43,7 @@ export function ProductSearch() {
     if (!open || recalls) return;
     let cancelled = false;
     setFailed(false);
-    fetch('/api/recalls')
-      .then(r => { if (!r.ok) throw new Error('recalls unavailable'); return r.json(); })
+    loadRecallList()
       .then(d => { if (!cancelled) setRecalls(d.recalls ?? []); })
       .catch(() => { if (!cancelled) setFailed(true); });
     return () => { cancelled = true; };

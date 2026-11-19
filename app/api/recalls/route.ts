@@ -6,16 +6,18 @@ export const dynamic = 'force-dynamic';
 // A cold CPSC query can take close to a minute; give the function room to wait for it.
 export const maxDuration = 60;
 
-// CDN keeps a copy for 5 minutes, then serves the old copy while it refreshes in the
-// background (for up to a day), so visitors never wait on the CPSC API directly.
-const CDN_CACHE = 'public, max-age=0, s-maxage=300, stale-while-revalidate=86400';
+// Both Vercel's CDN and the visitor's browser keep a copy for 5 minutes, then use the old
+// copy while a fresh one loads in the background (for up to a day). Visitors never wait on
+// the agency APIs, and a repeat visit or a second page doesn't download the list again.
+// Vercel strips s-maxage from Cache-Control, so the CDN gets its own header.
+const CACHE = 'public, max-age=300, stale-while-revalidate=86400';
 
 export async function GET() {
   try {
     const recalls = await fetchRecalls();
     return NextResponse.json(
       { recalls, lastUpdated: new Date().toISOString() },
-      { headers: { 'Cache-Control': CDN_CACHE } },
+      { headers: { 'Cache-Control': CACHE, 'Vercel-CDN-Cache-Control': CACHE } },
     );
   } catch (err) {
     console.error('CPSC fetch failed:', err);

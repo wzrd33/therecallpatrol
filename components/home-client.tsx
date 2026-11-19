@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import type { Recall } from '@/types/recalls';
+import { loadRecallList } from '@/lib/recall-list';
 import { useLists, type ListItem } from '@/lib/lists';
 import { RecallSheet, recallEmoji } from '@/components/recall-sheet';
 import { SearchLauncher } from '@/components/product-search';
@@ -40,8 +41,7 @@ export function HomeClient({ initial, counts }: { initial: Recall[]; counts: Rec
   const [selected, setSelected] = useState<Recall | null>(null);
 
   useEffect(() => {
-    fetch('/api/recalls')
-      .then(r => { if (!r.ok) throw new Error('recalls unavailable'); return r.json(); })
+    loadRecallList()
       .then(d => { setRecalls(d.recalls ?? []); setLoading(false); })
       .catch(() => { setError(true); setLoading(false); });
   }, []);

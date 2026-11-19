@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import type { Recall } from '@/types/recalls';
+import { loadRecallList } from '@/lib/recall-list';
 import { useLists, type ListItem } from '@/lib/lists';
 import { useHomeItems } from '@/hooks/use-home-items';
 import { readProfile } from '@/hooks/use-patrol';
@@ -25,8 +26,7 @@ export function MyHomePage() {
 
   useEffect(() => {
     setNickname(readProfile()?.nickname?.trim() ?? '');
-    fetch('/api/recalls')
-      .then(r => { if (!r.ok) throw new Error('recalls unavailable'); return r.json(); })
+    loadRecallList()
       .then(d => { setRecalls(d.recalls ?? []); setLoading(false); })
       .catch(() => { setFailed(true); setLoading(false); });
   }, []);

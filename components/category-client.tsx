@@ -5,6 +5,7 @@ import { CATEGORY_META, dataCategory as toDataCategory } from '@/lib/categories'
 import Image from 'next/image';
 import Link from 'next/link';
 import type { Recall, Category } from '@/types/recalls';
+import { loadRecallList } from '@/lib/recall-list';
 import { useLists } from '@/lib/lists';
 import { RecallSheet } from '@/components/recall-sheet';
 import { recallName, hazardTag, recallPath } from '@/utils/recall-name';
@@ -25,8 +26,7 @@ export function CategoryClient({ slug, initial, total }: { slug: string; initial
   const [selected, setSelected] = useState<Recall | null>(null);
 
   useEffect(() => {
-    fetch('/api/recalls')
-      .then(r => { if (!r.ok) throw new Error('recalls unavailable'); return r.json(); })
+    loadRecallList()
       .then(d => {
         const all: Recall[] = d.recalls ?? [];
         const mine = all.filter(r => r.category === dataCategory);
