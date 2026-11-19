@@ -103,7 +103,9 @@ export function HomeClient({ initial, counts }: { initial: Recall[]; counts: Rec
     return `${joined}, ${fmt(dates[0])} to ${fmt(dates[dates.length - 1])}`;
   }, [recalls]);
   const homeAlerts = homeItems.filter(i => homeMatches[i.id]?.length > 0).length;
-  const recallOfDay = useMemo(() => pickRecallOfDay(recalls), [recalls]);
+  // Picked in the browser once the full list is in. The server page can be up to an hour old
+  // and only holds part of the list, so a pick made there could differ from the browser's.
+  const recallOfDay = useMemo(() => (loading ? null : pickRecallOfDay(recalls)), [loading, recalls]);
 
   const scroll = (dir: number) => {
     trackRef.current?.scrollBy({ left: dir * 340, behavior: 'smooth' });
