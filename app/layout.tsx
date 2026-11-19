@@ -79,7 +79,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <a href="mailto:team@therecallpatrol.com" className="px-3 py-3 hover:text-white">Contact</a>
             </nav>
             <span className="text-center sm:text-right">
-              Recall data from the U.S. Consumer Product Safety Commission and the FDA.<br />
+              Recall data from the U.S. Consumer Product Safety Commission, the FDA and the USDA.<br />
               © {new Date().getFullYear()} therecallpatrol.com
             </span>
           </div>
