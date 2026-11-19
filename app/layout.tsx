@@ -68,20 +68,24 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
         {/* Footer */}
         <footer className="bg-navy border-t border-white/10 py-8">
-          <div className="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4 text-white/50 text-sm">
-            <div className="flex items-center gap-2">
-              <Image src="/images/scout-logo.webp" alt="Scout" width={28} height={28} className="rounded-md opacity-70" />
-              <span>Recall Patrol. Keeping households safe.</span>
+          <div className="max-w-6xl mx-auto px-4 text-white/50 text-sm">
+            {/* Brand on the left, links on the right */}
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <Image src="/images/scout-logo.webp" alt="Scout" width={28} height={28} className="rounded-md opacity-70" />
+                <span>Recall Patrol. Keeping households safe.</span>
+              </div>
+              <nav aria-label="Site information" className="flex gap-1 sm:-mr-3">
+                <Link href="/about" className="px-3 py-3 hover:text-white">About</Link>
+                <Link href="/privacy" className="px-3 py-3 hover:text-white">Privacy</Link>
+                <a href="mailto:team@therecallpatrol.com" className="px-3 py-3 hover:text-white">Contact</a>
+              </nav>
             </div>
-            <nav aria-label="Site information" className="flex gap-1">
-              <Link href="/about" className="px-3 py-3 hover:text-white">About</Link>
-              <Link href="/privacy" className="px-3 py-3 hover:text-white">Privacy</Link>
-              <a href="mailto:team@therecallpatrol.com" className="px-3 py-3 hover:text-white">Contact</a>
-            </nav>
-            <span className="text-center sm:text-right">
-              Recall data from the U.S. Consumer Product Safety Commission, the FDA and the USDA.<br />
-              © {new Date().getFullYear()} therecallpatrol.com
-            </span>
+            {/* Fine print on its own line under a divider */}
+            <div className="mt-4 pt-4 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-white/40 text-center sm:text-left">
+              <span>Recall data from the U.S. Consumer Product Safety Commission, the FDA and the USDA.</span>
+              <span className="whitespace-nowrap">© {new Date().getFullYear()} therecallpatrol.com</span>
+            </div>
           </div>
         </footer>
         <Analytics />
